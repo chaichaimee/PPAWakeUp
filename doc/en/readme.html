@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PPAWakeUp - NVDA Add-on</title>
+<style>
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.7;
+    padding: 30px;
+    background-color: #f5f7fa;
+    color: #2d3748;
+}
+.container {
+    max-width: 860px;
+    margin: auto;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+h1, h2 {
+    text-align: center;
+    color: #1a365d;
+    margin-top: 0.8em;
+    margin-bottom: 0.4em;
+}
+h2 {
+    margin-top: 2.2em;
+}
+b {
+    font-weight: bold;
+    color: #2c5282;
+}
+.section {
+    margin-bottom: 2.5em;
+}
+.nvda-logo {
+    display: block;
+    margin: 0 auto 30px;
+    width: 140px;
+    height: auto;
+}
+.hotkey {
+    background: #f7fafc;
+    border-left: 5px solid #3182ce;
+    padding: 18px 22px;
+    margin: 22px 0;
+    border-radius: 0 8px 8px 0;
+    font-family: Consolas, monospace;
+    font-size: 1.05em;
+}
+.tap-explanation {
+    background: #ebf8ff;
+    padding: 18px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border: 1px solid #bee3f8;
+}
+.note {
+    background: #fffbeb;
+    border-left: 5px solid #d69e2e;
+    padding: 16px 20px;
+    margin: 25px 0;
+    border-radius: 0 8px 8px 0;
+}
+.center {
+    text-align: center;
+}
+.github-link {
+    color: #2b6cb0;
+    text-decoration: none;
+    font-weight: bold;
+}
+.github-link:hover {
+    text-decoration: underline;
+}
+hr {
+    margin: 2.5em 0;
+    border: 0;
+    height: 1px;
+    background: #e2e8f0;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="section">
+        <img src="https://www.nvaccess.org/files/nvda/documentation/userGuide/images/nvda.ico" 
+             alt="NVDA Logo" class="nvda-logo">
+        <h1>PPAWakeUp</h1>
+        <p class="center">Quick PPA Tatip control with smart tap gestures</p>
+    </div>
+
+    <br>
+
+    <div class="section center">
+        <p><b>Author:</b> chai chaimee</p>
+        <p><b>Repository:</b> 
+           <a href="https://github.com/chaichaimee/PPAWakeUp" class="github-link">
+           https://github.com/chaichaimee/PPAWakeUp
+           </a>
+        </p>
+    </div>
+
+    <hr>
+
+    <div class="section">
+        <h2>Description</h2>
+        <br>
+        <p>
+            <strong>PPAWakeUp</strong> is a streamlined NVDA add-on designed to provide quick access 
+            to PPA Tatip Thai speech synthesizer functions using a single hotkey with multiple tap combinations.
+        </p>
+        <br>
+        <p>
+            With just the <strong>Windows+P</strong> key combination, you can perform three essential functions 
+            depending on how many times you tap — keeping your workflow fast and interruption-free.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>Hot Keys</h2>
+        <br>
+
+        <div class="hotkey">
+            <strong>Windows+P</strong> (Single tap) → <strong>Wake up PPA Tatip</strong><br>
+            Restarts the <code>windows_tatip.exe</code> process to ensure the synthesizer is running properly
+        </div>
+
+        <div class="hotkey">
+            <strong>Windows+P</strong> (Double tap) → <strong>Open PPA Tatip Options</strong><br>
+            Launches the configuration window (<code>openoption.exe</code>) for adjusting synthesizer settings
+        </div>
+
+        <div class="hotkey">
+            <strong>Windows+P</strong> (Triple tap) → <strong>Open Tatip Dictionary File</strong><br>
+            Opens the <code>userdict.txt</code> file for quick dictionary editing
+        </div>
+
+        <div class="tap-explanation">
+            <strong>Tip:</strong> Tap the keys in quick succession (similar to double-click timing).<br>
+            The add-on detects 1, 2, or 3 taps within a short time window.
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Why Use PPAWakeUp?</h2>
+        <br>
+        <p>
+            This add-on is specially created for users who rely on the <strong>PPA Tatip</strong> Thai synthesizer.
+        </p>
+        <br>
+        <p>
+            It provides the most frequently used functions with a clean, minimalist approach — 
+            no extra commands cluttering your NVDA.
+        </p>
+        <br>
+        <p>
+            The tap-based interface is fast, intuitive, and efficient — perfect for daily use.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>Technical Details</h2>
+        <br>
+        <ul>
+            <li>Hotkey: Windows+P (with tap detection)</li>
+            <li>Supported gestures: 1 tap • 2 taps • 3 taps</li>
+            <li>Actions: Restart synthesizer • Open settings • Open user dictionary</li>
+            <li>Minimal resource usage</li>
+            <li>Designed specifically for PPA Tatip Thai speech engine</li>
+        </ul>
+    </div>
+
+    <div class="section note">
+        <strong>Note:</strong> This add-on requires the PPA Tatip synthesizer to be installed on your system.
+    </div>
+
+    <br><br>
+
+</div>
+
+</body>
+</html>

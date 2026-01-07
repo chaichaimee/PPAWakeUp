@@ -1,0 +1,7 @@
+summary = "PPAWakeUp"
+description = """Retrieve PPA Tatip Synthesizers that are stuck and return to normal operation.
+Hot Keys:
+Windows+P
+Single Tap wake up  PPA Tatip
+Double Tap Open PPA Tatip options
+Tripple Tap Open Tatip Dictionary File"""

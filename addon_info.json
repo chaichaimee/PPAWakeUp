@@ -1,10 +1,10 @@
 ﻿{
   "addon_name": "PPAWakeUp",
   "addon_description": "Adds copy to clipboard functionality",
-  "addon_version": "2025.4",
+  "addon_version": "2026.1",
   "addon_author": "chaichaimee",
   "addon_url": "https://github.com/chaichaimee/PPAWakeUp",
-  "addon_download_url": "https://github.com/chaichaimee/PPAWakeUp/releases/download/v2025.4/PPAWakeUp-v2025.4.nvda-addon",
+  "addon_download_url": "https://github.com/chaichaimee/PPAWakeUp/releases/download/v2026.1/PPAWakeUp-v2026.1.nvda-addon",
   "addon_min_nvda_version": "2022.4"
 }
 

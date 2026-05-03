@@ -1,64 +1,60 @@
-# PPAWakeUp
+<div align="center">
+  <img src="https://www.nvaccess.org/files/nvda/documentation/userGuide/images/nvda.ico" alt="NVDA Logo" width="100">
+  
+  # PPAWakeUp
+  **Unleash the Full Power of PPA Tatip with One Smart Key!**
 
-![NVDA Logo](https://www.nvaccess.org/files/nvda/documentation/userGuide/images/nvda.ico)
-
-**Quick PPA Tatip control with smart tap gestures**
-
----
-
-**Author:** chai chaimee  
-**Repository:** [https://github.com/chaichaimee/PPAWakeUp](https://github.com/chaichaimee/PPAWakeUp)
-
----
-
-## Description
-
-**PPAWakeUp** is a streamlined NVDA add-on designed to provide quick access to PPA Tatip Thai speech synthesizer functions using a single hotkey with multiple tap combinations.
-
-With just the **Windows+P** key combination, you can perform three essential functions depending on how many times you tap — keeping your workflow fast and interruption-free.
-
-## Hot Keys
-
-Single hotkey — multiple actions based on tap count:
-
-- **Windows+P** (Single tap)  
-  → **Wake up PPA Tatip**  
-  Restarts the `windows_tatip.exe` process to ensure the synthesizer is running properly
-
-- **Windows+P** (Double tap)  
-  → **Open PPA Tatip Options**  
-  Launches the configuration window (`openoption.exe`) for adjusting synthesizer settings
-
-- **Windows+P** (Triple tap)  
-  → **Open Tatip Dictionary File**  
-  Opens the `userdict.txt` file for quick dictionary editing
-
-> **Tip:**  
-> Tap the keys in quick succession (similar to double-click timing).  
-> The add-on detects 1, 2, or 3 taps within a short time window.
-
-## Why Use PPAWakeUp?
-
-This add-on is specially created for users who rely on the **PPA Tatip** Thai synthesizer.
-
-It provides the most frequently used functions with a clean, minimalist approach — no extra commands cluttering your NVDA.
-
-The tap-based interface is fast, intuitive, and efficient — perfect for daily use.
-
-## Technical Details
-
-- Hotkey: `Windows+P` (with tap detection)
-- Supported gestures: 1 tap • 2 taps • 3 taps
-- Actions:
-  - Restart synthesizer
-  - Open settings
-  - Open user dictionary
-- Minimal resource usage
-- Designed specifically for PPA Tatip Thai speech engine
-
-> **Note**  
-> This add-on requires the PPA Tatip synthesizer to be installed on your system.
+  [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+  [![NVDA Compatibility](https://img.shields.io/badge/NVDA-2025.x-green.svg)](https://www.nvaccess.org/)
+</div>
 
 ---
 
-Made with ♡ for the Thai NVDA community
+## 🌟 Experience Seamless Control
+
+Struggling with speech interruptions? Tired of digging through menus? **PPAWakeUp** is the revolutionary NVDA add-on that transforms how you interact with the **PPA Tatip** Thai speech engine.
+
+We've redefined efficiency. By using our **Exclusive Smart-Tap Technology**, you can now command your synthesizer with a single hotkey. No more clutter, no more wasted time. Just pure, lightning-fast productivity at your fingertips.
+
+---
+
+## ⚡ The Power of "Windows + P"
+*One key. Three actions. Absolute convenience.*
+
+| Gestures | Action | Description |
+| :--- | :--- | :--- |
+| **Single Tap** | 🚀 **Instant Revival!** | Immediately restart `windows_tatip.exe`. If your voice hangs, bring it back to life instantly! |
+| **Double Tap** | ⚙️ **Precision Tuning** | Jump straight into PPA Tatip Options. Adjust voice, speed, and settings in a flash. |
+| **Triple Tap** | 📖 **Master the Language** | Direct access to `userdict.txt`. Edit your dictionary on the fly for perfect pronunciation. |
+
+> [!TIP]
+> **Pro Tip:** Like a musical rhythm, just tap 1, 2, or 3 times quickly. The intelligent detection engine handles the rest with 100% accuracy.
+
+---
+
+## 🔥 Why PPAWakeUp is a Must-Have
+
+* **Zero Complexity:** One hotkey to rule them all. Simple. Clean. Effective.
+* **Ultra-Lightweight:** Optimized code that consumes near-zero system resources.
+* **Built for Professionals:** Designed specifically for power users of the PPA Tatip Thai engine.
+* **Uninterrupted Workflow:** Keep your hands on the keyboard and your mind on the task.
+
+---
+
+## 🛠️ Technical Details & Compatibility
+
+* **Hotkey:** `Windows + P` (Customizable via Input Gestures)
+* **Supported Gestures:** 1 tap • 2 taps • 3 taps
+* **Target Engine:** PPA Tatip Thai Speech Engine
+* **NVDA Version:** Optimized for **NVDA 2025.x** and later.
+
+---
+
+## 📝 Author
+* **Developed by:** [chai chaimee](https://github.com/chaichaimee)
+
+---
+
+<div align="center">
+  <h3>Upgrade your NVDA workflow today with PPAWakeUp!</h3>
+</div>

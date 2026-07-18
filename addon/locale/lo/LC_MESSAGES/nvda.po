@@ -1,0 +1,57 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PPAWakeUp 2026.7.7\n"
+"Report-Msgid-Bugs-To: chaicm75@gmail.com\n"
+"POT-Creation-Date: 2026-07-18 06:12+0700\n"
+"PO-Revision-Date: \n"
+"Last-Translator: chaiBot and Malee Yamazaki\n"
+"Language-Team: Lao\n"
+"Language: lo\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: DevOn Addon\n"
+
+#: __init__.py:196
+msgid "Dictionary"
+msgstr "ວັດຈະນານຸກົມ"
+
+#: __init__.py:181
+msgid "Error: Failed to open PPA Tatip options - {error}"
+msgstr "ຂໍ້ຜິດພາດ: ບໍ່ສາມາດເປີດຕົວເລືອກ PPA Tatip ໄດ້ - {error}"
+
+#: __init__.py:199
+msgid "Error: Failed to open dictionary file - {error}"
+msgstr "ຂໍ້ຜິດພາດ: ບໍ່ສາມາດເປີດໄຟລ໌ວັດຈະນານຸກົມໄດ້ - {error}"
+
+#: __init__.py:174
+msgid "Error: openoption.exe not found. Please ensure PPA Tatip is installed."
+msgstr "ຂໍ້ຜິດພາດ: ບໍ່ພົບ openoption.exe ກະລຸນາກວດສອບວ່າຕິດຕັ້ງ PPA Tatip ແລ້ວ"
+
+#: __init__.py:192
+msgid "Error: userdict.txt not found. Please ensure PPA Tatip is installed."
+msgstr "ຂໍ້ຜິດພາດ: ບໍ່ພົບ userdict.txt ກະລຸນາກວດສອບວ່າຕິດຕັ້ງ PPA Tatip ແລ້ວ"
+
+#: __init__.py:145
+msgid "Error: windows_tatip.exe not found. Please ensure PPA Tatip is installed."
+msgstr "ຂໍ້ຜິດພາດ: ບໍ່ພົບ windows_tatip.exe ກະລຸນາກວດສອບວ່າຕິດຕັ້ງ PPA Tatip ແລ້ວ"
+
+#: __init__.py:178
+msgid "Option"
+msgstr "ຕົວເລືອກ"
+
+#: __init__.py:19
+msgid "PPAWakeUp"
+msgstr "PPAWakeUp"
+
+#: __init__.py:163
+msgid "Unexpected error: {error}"
+msgstr "ຂໍ້ຜິດພາດທີ່ບໍ່ຄາດຄິດ: {error}"
+
+#: __init__.py:150
+msgid "Wake up"
+msgstr "ປຸກ"
+
+#: __init__.py:54
+msgid "Wake up PPA Tatip (single tap), Open options (double tap), Open dictionary (triple tap)"
+msgstr "ປຸກ PPA Tatip (ກົດຄັ້ງດຽວ), ເປີດຕົວເລືອກ (ກົດສອງຄັ້ງ), ເປີດວັດຈະນານຸກົມ (ກົດສາມຄັ້ງ)"

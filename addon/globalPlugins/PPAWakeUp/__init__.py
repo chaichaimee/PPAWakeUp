@@ -1,5 +1,5 @@
 # __init__.py
-# Copyright (C) 2026 'Chai Chaimee'
+# Copyright (C) 2026 Chai Chaimee
 # Licensed under GNU General Public License. See COPYING.txt for details.
 
 import globalPluginHandler
@@ -8,160 +8,200 @@ import ui
 import subprocess
 import os
 import winsound
-import logging
 import time
-import wx
+import threading
+import core
+import logHandler
 
-# Initialize translation
 addonHandler.initTranslation()
-
-# Set up logging
-logging.basicConfig(level=logging.DEBUG, filename='nvda_plugin.log')
-
-# Global variables for tap detection
-_last_tap_time = 0
-_tap_count = 0
-_triple_tap_threshold = 0.5  # 500ms
 
 class GlobalPlugin(globalPluginHandler.GlobalPlugin):
 	scriptCategory = _("PPAWakeUp")
-	
-	def find_tatip_path(self):
-		"""Find the path to windows_tatip.exe"""
-		primary_path = os.path.expandvars(r"%LocalAppData%\Programs\PPA Tatip\interface\windows_tatip.exe")
-		if os.path.exists(primary_path):
-			return primary_path
 
-		for base_dir in [r"C:\Program Files", r"C:\Program Files (x86)"]:
-			potential_path = os.path.join(base_dir, "PPA Tatip", "interface", "windows_tatip.exe")
-			if os.path.exists(potential_path):
-				return potential_path
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self._lastTapTime = 0.0
+		self._tapCount = 0
+		self._tapThreshold = 0.5
+		self._pendingCall = None
 
+	def _findTatipPath(self):
+		primary = os.path.expandvars(r"%LocalAppData%\Programs\PPA Tatip\interface\windows_tatip.exe")
+		if os.path.exists(primary):
+			return primary
+		for base in [r"C:\Program Files", r"C:\Program Files (x86)"]:
+			candidate = os.path.join(base, "PPA Tatip", "interface", "windows_tatip.exe")
+			if os.path.exists(candidate):
+				return candidate
 		return None
-	
+
 	def script_windows_p_tap(self, gesture):
-		"""Handle Windows+P single, double, and triple tap"""
-		global _last_tap_time, _tap_count
-		current_time = time.time()
-		
-		if current_time - _last_tap_time > _triple_tap_threshold:
-			_tap_count = 0
-		
-		_tap_count += 1
-		_last_tap_time = current_time
-		
-		def execute_action():
-			global _tap_count
-			if _tap_count == 1:
-				self._start_tatip()
-			elif _tap_count == 2:
-				self._open_tatip_option()
-			elif _tap_count >= 3:
-				self._open_tatip_dictionary()
-			
-			_tap_count = 0
-		
-		wx.CallLater(int(_triple_tap_threshold * 1000), execute_action)
-	
+		now = time.time()
+		if now - self._lastTapTime > self._tapThreshold:
+			self._tapCount = 0
+		self._tapCount += 1
+		self._lastTapTime = now
+
+		if self._pendingCall:
+			self._pendingCall.Stop()
+			self._pendingCall = None
+
+		self._pendingCall = core.callLater(
+			int(self._tapThreshold * 1000),
+			self._executeTapAction
+		)
+
 	script_windows_p_tap.__doc__ = _("Wake up PPA Tatip (single tap), Open options (double tap), Open dictionary (triple tap)")
 	script_windows_p_tap.category = scriptCategory
 
-	def _start_tatip(self):
-		"""Wake up PPA Tatip"""
+	def _executeTapAction(self):
+		self._pendingCall = None
+		if self._tapCount == 1:
+			self._startTatip()
+		elif self._tapCount == 2:
+			self._openTatipOption()
+		elif self._tapCount >= 3:
+			self._openTatipDictionary()
+		self._tapCount = 0
+
+	def _forceKillTatip(self):
+		"""Try multiple methods to force-kill windows_tatip.exe. Returns True if process is no longer running."""
+		processName = "windows_tatip.exe"
 		try:
-			tatip_path = self.find_tatip_path()
-			logging.debug(f"tatip_path: {tatip_path}")
+			subprocess.run(
+				["taskkill", "/f", "/t", "/im", processName],
+				stdout=subprocess.PIPE,
+				stderr=subprocess.PIPE,
+				timeout=2,
+				creationflags=subprocess.CREATE_NO_WINDOW
+			)
+		except Exception:
+			pass
 
-			if not tatip_path:
-				ui.message(_("Error: windows_tatip.exe not found. Please ensure PPA Tatip is installed."))
-				winsound.Beep(500, 500)
-				logging.error("windows_tatip.exe not found in expected locations")
-				return
+		# Wait a moment for cleanup
+		time.sleep(0.5)
 
-			ui.message(_("Wake up"))
-			winsound.Beep(100, 100)
+		# Check if process still exists
+		try:
+			checkResult = subprocess.run(
+				["tasklist", "/fi", f"IMAGENAME eq {processName}", "/nh"],
+				capture_output=True,
+				text=True,
+				timeout=2,
+				creationflags=subprocess.CREATE_NO_WINDOW
+			)
+			if processName.lower() not in checkResult.stdout.lower():
+				return True
+		except Exception:
+			pass
 
+		# Process still running, try alternative kill commands
+		killMethods = [
+			["taskkill", "/f", "/im", processName],
+			["tskill", processName],
+			["wmic", "process", "where", f"name='{processName}'", "delete"],
+		]
+		for method in killMethods:
 			try:
 				subprocess.run(
-					["taskkill", "/f", "/im", "windows_tatip.exe"],
+					method,
 					stdout=subprocess.PIPE,
 					stderr=subprocess.PIPE,
-					text=True,
-					timeout=0.3,
+					timeout=2,
 					creationflags=subprocess.CREATE_NO_WINDOW
 				)
-				logging.debug("Existing windows_tatip process terminated")
-			except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
-				logging.debug("No existing windows_tatip process or taskkill failed")
+				time.sleep(0.3)
+				# Re-check
+				checkResult = subprocess.run(
+					["tasklist", "/fi", f"IMAGENAME eq {processName}", "/nh"],
+					capture_output=True,
+					text=True,
+					timeout=2,
+					creationflags=subprocess.CREATE_NO_WINDOW
+				)
+				if processName.lower() not in checkResult.stdout.lower():
+					return True
+			except Exception:
+				continue
 
+		# Final check
+		try:
+			finalCheck = subprocess.run(
+				["tasklist", "/fi", f"IMAGENAME eq {processName}", "/nh"],
+				capture_output=True,
+				text=True,
+				timeout=2,
+				creationflags=subprocess.CREATE_NO_WINDOW
+			)
+			return processName.lower() not in finalCheck.stdout.lower()
+		except Exception:
+			return False
+
+	def _startTatip(self):
+		def worker():
 			try:
-				# Start tatip without hiding
+				tatipPath = self._findTatipPath()
+				if not tatipPath:
+					ui.message(_("Error: windows_tatip.exe not found. Please ensure PPA Tatip is installed."))
+					winsound.Beep(500, 500)
+					logHandler.log.error("windows_tatip.exe not found")
+					return
+
+				ui.message(_("Wake up"))
+				winsound.Beep(100, 100)
+
+				killed = self._forceKillTatip()
+				if not killed:
+					logHandler.log.warning("Force kill may not have succeeded, attempting launch anyway")
+
 				subprocess.Popen(
-					[tatip_path],
+					[tatipPath],
 					stdout=subprocess.PIPE,
 					stderr=subprocess.PIPE
 				)
-				logging.debug("windows_tatip.exe started")
-			except (subprocess.CalledProcessError, FileNotFoundError) as e:
-				ui.message(_("Error: Failed to start windows_tatip.exe - {error}").format(error=str(e)))
+			except Exception as e:
+				ui.message(_("Unexpected error: {error}").format(error=str(e)))
 				winsound.Beep(500, 500)
-				logging.error(f"Failed to start windows_tatip.exe: {str(e)}")
+				logHandler.log.error("startTatip error: %s", str(e))
 
-		except Exception as e:
-			ui.message(_("Unexpected error: {error}").format(error=str(e)))
-			winsound.Beep(500, 500)
-			logging.error(f"Unexpected error in start_tatip: {str(e)}")
+		threading.Thread(target=worker, daemon=True).start()
 
-	def _open_tatip_option(self):
-		"""Open PPA Tatip options window"""
-		try:
-			option_path = os.path.expandvars(r"%USERPROFILE%\AppData\Local\Programs\PPA Tatip\interface\openoption.exe")
-			if not os.path.exists(option_path):
-				ui.message(_("Error: openoption.exe not found. Please ensure PPA Tatip is installed."))
+	def _openTatipOption(self):
+		def worker():
+			try:
+				optionPath = os.path.expandvars(r"%USERPROFILE%\AppData\Local\Programs\PPA Tatip\interface\openoption.exe")
+				if not os.path.exists(optionPath):
+					ui.message(_("Error: openoption.exe not found. Please ensure PPA Tatip is installed."))
+					winsound.Beep(500, 500)
+					logHandler.log.error("openoption.exe not found")
+					return
+				ui.message(_("Option"))
+				subprocess.Popen([optionPath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			except Exception as e:
+				ui.message(_("Error: Failed to open PPA Tatip options - {error}").format(error=str(e)))
 				winsound.Beep(500, 500)
-				logging.error(f"openoption.exe not found at: {option_path}")
-				return
+				logHandler.log.error("openTatipOption error: %s", str(e))
 
-			ui.message(_("Option"))
-			subprocess.Popen(
-				[option_path],
-				stdout=subprocess.PIPE,
-				stderr=subprocess.PIPE
-			)
-			logging.debug("openoption.exe started")
-		except (subprocess.CalledProcessError, FileNotFoundError) as e:
-			ui.message(_("Error: Failed to open PPA Tatip options - {error}").format(error=str(e)))
-			winsound.Beep(500, 500)
-			logging.error(f"Failed to open openoption.exe: {str(e)}")
-		except Exception as e:
-			ui.message(_("Unexpected error: {error}").format(error=str(e)))
-			winsound.Beep(500, 500)
-			logging.error(f"Unexpected error in open_tatip_option: {str(e)}")
+		threading.Thread(target=worker, daemon=True).start()
 
-	def _open_tatip_dictionary(self):
-		"""Open PPA Tatip dictionary file"""
-		try:
-			# Get the dictionary file path
-			dict_path = os.path.expandvars(r"%USERPROFILE%\AppData\Local\Programs\PPA Tatip\interface\userdict.txt")
-			
-			if not os.path.exists(dict_path):
-				ui.message(_("Error: userdict.txt not found. Please ensure PPA Tatip is installed."))
+	def _openTatipDictionary(self):
+		def worker():
+			try:
+				dictPath = os.path.expandvars(r"%USERPROFILE%\AppData\Local\Programs\PPA Tatip\interface\userdict.txt")
+				if not os.path.exists(dictPath):
+					ui.message(_("Error: userdict.txt not found. Please ensure PPA Tatip is installed."))
+					winsound.Beep(500, 500)
+					logHandler.log.error("userdict.txt not found")
+					return
+				ui.message(_("Dictionary"))
+				os.startfile(dictPath)
+			except Exception as e:
+				ui.message(_("Error: Failed to open dictionary file - {error}").format(error=str(e)))
 				winsound.Beep(500, 500)
-				logging.error(f"userdict.txt not found at: {dict_path}")
-				return
-			
-			ui.message(_("Dictionary"))
-			
-			# Open the file with default text editor
-			os.startfile(dict_path)
-			logging.debug(f"Opened dictionary file: {dict_path}")
-			
-		except Exception as e:
-			ui.message(_("Error: Failed to open dictionary file - {error}").format(error=str(e)))
-			winsound.Beep(500, 500)
-			logging.error(f"Failed to open dictionary file: {str(e)}")
+				logHandler.log.error("openTatipDictionary error: %s", str(e))
 
-	# Set gestures
+		threading.Thread(target=worker, daemon=True).start()
+
 	__gestures = {
 		"kb:windows+p": "windows_p_tap",
 	}

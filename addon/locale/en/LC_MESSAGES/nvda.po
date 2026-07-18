@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: PPAWakeUp 2026.5.1\n"
+"Project-Id-Version: PPAWakeUp 2026.7.7\n"
 "Report-Msgid-Bugs-To: chaicm75@gmail.com\n"
-"POT-Creation-Date: 2026-05-03 07:34+0700\n"
+"POT-Creation-Date: 2026-07-18 06:12+0700\n"
 "PO-Revision-Date: \n"
 "Last-Translator: chaiBot and Malee Yamazaki\n"
 "Language-Team: English\n"
@@ -12,51 +12,46 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: DevOn Addon\n"
 
-#: __init__.py:153
+#: __init__.py:196
 msgid "Dictionary"
 msgstr "Dictionary"
 
-#: __init__.py:133
+#: __init__.py:181
 msgid "Error: Failed to open PPA Tatip options - {error}"
 msgstr "Error: Failed to open PPA Tatip options - {error}"
 
-#: __init__.py:160
+#: __init__.py:199
 msgid "Error: Failed to open dictionary file - {error}"
 msgstr "Error: Failed to open dictionary file - {error}"
 
-#: __init__.py:106
-msgid "Error: Failed to start windows_tatip.exe - {error}"
-msgstr "Error: Failed to start windows_tatip.exe - {error}"
-
-#: __init__.py:120
+#: __init__.py:174
 msgid "Error: openoption.exe not found. Please ensure PPA Tatip is installed."
 msgstr "Error: openoption.exe not found. Please ensure PPA Tatip is installed."
 
-#: __init__.py:148
+#: __init__.py:192
 msgid "Error: userdict.txt not found. Please ensure PPA Tatip is installed."
 msgstr "Error: userdict.txt not found. Please ensure PPA Tatip is installed."
 
-#: __init__.py:76
+#: __init__.py:145
 msgid "Error: windows_tatip.exe not found. Please ensure PPA Tatip is installed."
 msgstr "Error: windows_tatip.exe not found. Please ensure PPA Tatip is installed."
 
-#: __init__.py:125
+#: __init__.py:178
 msgid "Option"
 msgstr "Option"
 
-#: __init__.py:27
+#: __init__.py:19
 msgid "PPAWakeUp"
 msgstr "PPAWakeUp"
 
-#: __init__.py:111
-#: __init__.py:137
+#: __init__.py:163
 msgid "Unexpected error: {error}"
 msgstr "Unexpected error: {error}"
 
-#: __init__.py:81
+#: __init__.py:150
 msgid "Wake up"
 msgstr "Wake up"
 
-#: __init__.py:66
+#: __init__.py:54
 msgid "Wake up PPA Tatip (single tap), Open options (double tap), Open dictionary (triple tap)"
 msgstr "Wake up PPA Tatip (single tap), Open options (double tap), Open dictionary (triple tap)"

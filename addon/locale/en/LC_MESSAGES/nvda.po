@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: PPAWakeUp 2026.8.0\n"
+"Project-Id-Version: PPAWakeUp 2026.8.1\n"
 "Report-Msgid-Bugs-To: chaicm75@gmail.com\n"
-"POT-Creation-Date: 2026-07-28 10:29+0700\n"
+"POT-Creation-Date: 2026-07-28 14:47+0700\n"
 "PO-Revision-Date: \n"
 "Last-Translator: chaiBot and Malee Yamazaki\n"
 "Language-Team: English\n"
@@ -12,92 +12,92 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: DevOn Addon\n"
 
-#: __init__.py:294
+#: __init__.py:317
 msgid "Backup Tatip dictionary"
 msgstr "Backup Tatip dictionary"
 
-#: __init__.py:326
+#: __init__.py:344
 msgid "Backup completed: {dest}"
 msgstr "Backup completed: {dest}"
 
-#: __init__.py:329
+#: __init__.py:347
 msgid "Backup failed: file not written to {dest}"
 msgstr "Backup failed: file not written to {dest}"
 
-#: __init__.py:332
+#: __init__.py:350
 msgid "Backup failed: {error}"
 msgstr "Backup failed: {error}"
 
-#: __init__.py:349
+#: __init__.py:367
 msgid "Dictionary restored. Reloading PPA Tatip..."
 msgstr "Dictionary restored. Reloading PPA Tatip..."
 
-#: __init__.py:285
+#: __init__.py:308
 msgid "Error: Failed to open PPA Tatip options - {error}"
 msgstr "Error: Failed to open PPA Tatip options - {error}"
 
-#: __init__.py:343
+#: __init__.py:361
 msgid "Error: No backup file found. Please perform a backup first."
 msgstr "Error: No backup file found. Please perform a backup first."
 
-#: __init__.py:365
+#: __init__.py:383
 msgid "Error: Tatip folder not found."
 msgstr "Error: Tatip folder not found."
 
-#: __init__.py:278
+#: __init__.py:301
 msgid "Error: openoption.exe not found. Please ensure PPA Tatip is installed."
 msgstr "Error: openoption.exe not found. Please ensure PPA Tatip is installed."
 
-#: __init__.py:317
+#: __init__.py:336
 msgid "Error: userdict.txt not found at source location."
 msgstr "Error: userdict.txt not found at source location."
 
-#: __init__.py:243
+#: __init__.py:266
 msgid "Error: windows_tatip.exe not found. Please ensure PPA Tatip is installed."
 msgstr "Error: windows_tatip.exe not found. Please ensure PPA Tatip is installed."
 
-#: __init__.py:371
+#: __init__.py:389
 msgid "Failed to open folder: {error}"
 msgstr "Failed to open folder: {error}"
 
-#: __init__.py:296
+#: __init__.py:319
 msgid "Open Tatip folder"
 msgstr "Open Tatip folder"
 
-#: __init__.py:282
+#: __init__.py:305
 msgid "Option"
 msgstr "Option"
 
-#: __init__.py:27
-#: __init__.py:87
-#: __init__.py:299
+#: __init__.py:53
+#: __init__.py:113
+#: __init__.py:322
 msgid "PPA Tatip – Menu"
 msgstr "PPA Tatip – Menu"
 
-#: __init__.py:93
+#: __init__.py:119
 msgid "PPAWakeUp"
 msgstr "PPAWakeUp"
 
-#: __init__.py:295
+#: __init__.py:318
 msgid "Restore Tatip dictionary"
 msgstr "Restore Tatip dictionary"
 
-#: __init__.py:354
+#: __init__.py:372
 msgid "Restore failed: {error}"
 msgstr "Restore failed: {error}"
 
-#: __init__.py:369
+#: __init__.py:387
 msgid "Tatip folder opened"
 msgstr "Tatip folder opened"
 
-#: __init__.py:261
+#: __init__.py:284
 msgid "Unexpected error: {error}"
 msgstr "Unexpected error: {error}"
 
-#: __init__.py:248
+#: __init__.py:271
 msgid "Wake up"
 msgstr "Wake up"
 
-#: __init__.py:220
+#: __init__.py:243
 msgid "Wake up PPA Tatip (single tap), Open options (double tap), Open menu (triple tap)"
 msgstr "Wake up PPA Tatip (single tap), Open options (double tap), Open menu (triple tap)"

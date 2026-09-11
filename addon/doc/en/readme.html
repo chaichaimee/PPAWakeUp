@@ -1,85 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>PPAWakeUp - The Ultimate NVDA Experience</title>
+<title>PPAWakeUp NVDA Add-on</title>
 <style>
 body {
-    font-family: Arial, Helvetica, sans-serif;
-    line-height: 1.7;
-    padding: 30px;
-    background-color: #f5f7fa;
-    color: #2d3748;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    padding: 20px;
+    background-color: #f4f4f4;
 }
 .container {
-    max-width: 860px;
+    max-width: 800px;
     margin: auto;
-    background: #ffffff;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    background: #fff;
+    padding: 20px 40px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-h1, h2 {
+h1, h2, h3 {
     text-align: center;
-    color: #1a365d;
-    margin-top: 0.8em;
-    margin-bottom: 0.4em;
-}
-h2 {
-    margin-top: 2.2em;
 }
 b {
     font-weight: bold;
-    color: #2c5282;
 }
 .section {
-    margin-bottom: 2.5em;
+    margin-bottom: 30px;
 }
 .nvda-logo {
     display: block;
-    margin: 0 auto 30px;
-    width: 140px;
+    margin: 0 auto 20px;
+    width: 120px;
     height: auto;
 }
 .hotkey {
-    background: #f7fafc;
-    border-left: 5px solid #3182ce;
-    padding: 18px 22px;
-    margin: 22px 0;
-    border-radius: 0 8px 8px 0;
-    font-family: Consolas, monospace;
-    font-size: 1.05em;
+    background: #f8f9fa;
+    border-left: 4px solid #3498db;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 0 4px 4px 0;
 }
 .tap-explanation {
-    background: #ebf8ff;
-    padding: 18px;
-    border-radius: 8px;
-    margin: 20px 0;
-    border: 1px solid #bee3f8;
+    background: #e8f4fc;
+    padding: 15px;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+.feature-item {
+    margin: 15px 0;
+    padding-left: 10px;
 }
 .note {
-    background: #fffbeb;
-    border-left: 5px solid #d69e2e;
-    padding: 16px 20px;
-    margin: 25px 0;
-    border-radius: 0 8px 8px 0;
-}
-.center {
-    text-align: center;
-}
-.github-link {
-    color: #2b6cb0;
-    text-decoration: none;
-    font-weight: bold;
-}
-.github-link:hover {
-    text-decoration: underline;
-}
-hr {
-    margin: 2.5em 0;
-    border: 0;
-    height: 1px;
-    background: #e2e8f0;
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 12px;
+    margin: 15px 0;
+    border-radius: 0 4px 4px 0;
 }
 </style>
 </head>
@@ -87,90 +63,145 @@ hr {
 
 <div class="container">
 
-    <div class="section">
-        <img src="https://www.nvaccess.org/files/nvda/documentation/userGuide/images/nvda.ico" 
-             alt="NVDA Logo" class="nvda-logo">
-        <h1>PPAWakeUp</h1>
-        <p class="center"><b>Unleash the Full Power of PPA Tatip with One Smart Key!</b></p>
-    </div>
-
+<div class="section">
+    <img src="https://www.nvaccess.org/files/nvda/documentation/userGuide/images/nvda.ico" alt="NVDA Logo" class="nvda-logo">
+    <h1>PPAWakeUp</h1>
     <br>
+    <p style="text-align: center;">Keep PPA Tatip awake, quiet, and crash-free, right from Windows+P.</p>
+</div>
+<br>
+<div class="section">
+    <p style="text-align: center;"><b>author:</b> chai chaimee</p>
+    <p style="text-align: center;"><b>url:</b> https://github.com/chaichaimee/PPAWakeUp</p>
+</div>
+<br>
 
-    <div class="section center">
-        <p><b>Developed by:</b> chai chaimee</p>
-        <p><b>Get it now:</b> 
-           <a href="https://github.com/chaichaimee/PPAWakeUp" class="github-link">
-           View on GitHub Repository
-           </a>
-        </p>
-    </div>
+<div class="section">
+<h2>Introduction</h2>
+<p>PPAWakeUp is an NVDA add-on built to keep the third-party screen reading engine PPA Tatip running smoothly alongside NVDA.</p>
+<br>
+<p>PPA Tatip is known to silently stop working under certain conditions, such as when it is asked to speak certain Asian-language characters, or when a file dialog's action button (Open, OK, Save, Yes) receives focus right after the dialog appears. PPAWakeUp watches for these situations and steps in automatically, and it also gives you a single, familiar key press, Windows+P, to force-kill and relaunch PPA Tatip whenever it needs a fresh start.</p>
+<br>
+<p>Beyond crash recovery, the add-on bundles a small menu for everyday PPA Tatip maintenance: opening its options window, backing up and restoring your custom dictionary, and jumping straight to its installation folder.</p>
+</div>
+<br>
 
-    <hr>
+<div class="section">
+<h3>Hot Keys</h3>
+<div class="hotkey">
+<b>Windows+P</b><br>
+Single Tap : Wake up PPA Tatip (force-kill and relaunch it)<br>
+Double Tap : Open PPA Tatip options<br>
+Triple Tap : Open the PPA Tatip management menu
+</div>
+<div class="tap-explanation">
+PPAWakeUp counts how many times you press Windows+P in quick succession (within half a second of each press). It waits briefly after your last tap to see if another one is coming, then runs the action for the final tap count: one tap wakes PPA Tatip up, two taps opens its options window, and three or more taps opens the management menu.
+</div>
+<div class="note">
+This gesture is intercepted at a low level so that, whichever tap count you use, NVDA also forces the Windows key back up afterwards. This prevents Windows from thinking the key is still held down, which would otherwise block you from typing the letter "p" until you restart.
+</div>
+</div>
+<br>
 
-    <div class="section">
-        <h2>Experience Seamless Control</h2>
-        <br>
-        <p>
-            Struggling with speech interruptions? Tired of digging through menus? 
-            <strong>PPAWakeUp</strong> is the revolutionary NVDA add-on that transforms how you interact with the 
-            PPA Tatip Thai speech engine. 
-        </p>
-        <br>
-        <p>
-            We've redefined efficiency. By using our <strong>Exclusive Smart-Tap Technology</strong>, 
-            you can now command your synthesizer with a single hotkey. No more clutter, no more wasted time. 
-            Just pure, lightning-fast productivity at your fingertips.
-        </p>
-    </div>
+<div class="section">
+<h2>Features</h2>
 
-    <div class="section">
-        <h2>The Power of "Windows+P"</h2>
-        <br>
-        <p class="center">One key. Three actions. Absolute convenience.</p>
+<div class="feature-item">
+<h3>Wake Up PPA Tatip (Single Tap)</h3>
+<p>A single Windows+P press force-kills any running copy of PPA Tatip and starts a fresh one. This is the main recovery action for when PPA Tatip has crashed or stopped responding.</p>
+<br>
+<p>Step by step, when you single-tap Windows+P:</p>
+<br>
+<p>1. NVDA announces "Wake up" and plays a short low beep.<br>
+2. The add-on locates windows_tatip.exe, checking the standard Local AppData install path first, then Program Files and Program Files (x86) as fallbacks.<br>
+3. If the executable cannot be found anywhere, you hear an error message and an alert beep, and the attempt stops.<br>
+4. The add-on tries to force-kill any existing PPA Tatip process, first with taskkill, then, if that does not confirm the process is gone, with PowerShell's Stop-Process, and finally with wmic as a last resort.<br>
+5. PPA Tatip is relaunched. The add-on then polls to confirm the process actually appears in the running task list, waiting up to about 2.5 seconds per attempt.<br>
+6. If the relaunch does not confirm within that time, the add-on retries automatically (up to three attempts in total by default, or only one attempt if automatic retry has been turned off in settings).<br>
+7. If PPA Tatip still has not confirmed after all attempts, you hear a message asking you to try Windows+P again, along with an alert beep.</p>
+<br>
+<p>If you have just successfully woken PPA Tatip up within the last 3 seconds, pressing Windows+P again is treated as unnecessary: NVDA tells you PPA Tatip is already awake and plays a short beep, rather than killing a process that only just finished starting.</p>
+<br>
+<p>All of this work happens on a background thread, so NVDA itself never freezes while PPA Tatip is being restarted, and repeated presses while a wake-up is already underway are answered with a "please wait" message instead of starting a second attempt.</p>
+</div>
 
-        <div class="hotkey">
-            <strong>Single Tap</strong> → <strong>Instant Revival!</strong><br>
-            Immediately restart <code>windows_tatip.exe</code>. If your voice hangs, bring it back to life instantly without missing a beat!
-        </div>
+<div class="feature-item">
+<h3>Open PPA Tatip Options (Double Tap)</h3>
+<p>Double-tapping Windows+P looks for openoption.exe inside PPA Tatip's interface folder under your user profile and launches it, announcing "Option" as it does. If the file cannot be found, you hear an error message and an alert beep.</p>
+</div>
 
-        <div class="hotkey">
-            <strong>Double Tap</strong> → <strong>Precision Tuning</strong><br>
-            Jump straight into the PPA Tatip Options. Adjust your voice, speed, and settings in a flash.
-        </div>
+<div class="feature-item">
+<h3>PPA Tatip Management Menu (Triple Tap)</h3>
+<p>Triple-tapping Windows+P opens a small floating list-box window with four choices: Tatip reader setting, Backup Tatip dictionary, Restore Tatip dictionary, and Open Tatip folder.</p>
+<br>
+<p>The menu window can be operated entirely from the keyboard: press Enter to activate the highlighted item, or Escape to close the menu without choosing anything. It also closes itself automatically if left untouched for 15 seconds, and that timeout resets every time you press a key inside it.</p>
+</div>
 
-        <div class="hotkey">
-            <strong>Triple Tap</strong> → <strong>Master the Language</strong><br>
-            Direct access to your <code>userdict.txt</code>. Edit your dictionary on the fly and make PPA Tatip speak exactly how you want.
-        </div>
+<div class="feature-item">
+<h3>Tatip Reader Setting Dialog</h3>
+<p>Opened from the management menu, this dialog offers three checkboxes that control the add-on's protective behaviors:</p>
+<br>
+<p>- Skip Chinese, Japanese and Korean characters when speaking<br>
+- Protect against crash when focusing Open/OK/Save buttons in dialogs<br>
+- Automatically retry wake up if PPA Tatip does not start</p>
+<br>
+<p>All three options are enabled by default. Choices are saved as soon as you click OK, and are reloaded automatically the next time NVDA starts.</p>
+</div>
 
-        <div class="tap-explanation">
-            <strong>Pro Tip:</strong> Like a musical rhythm, just tap 1, 2, or 3 times quickly. 
-            The intelligent detection engine handles the rest, executing your command with 100% accuracy.
-        </div>
-    </div>
+<div class="feature-item">
+<h3>Automatic Speech Filtering for Problem Characters</h3>
+<p>PPAWakeUp installs itself in front of NVDA's own speech output. When the "Skip Chinese, Japanese and Korean characters when speaking" setting is enabled, every piece of text NVDA is about to speak is checked character by character against a large table of Unicode ranges known to make PPA Tatip stop working, covering CJK ideographs, Hiragana, Katakana, Hangul, Bopomofo, and several related scripts.</p>
+<br>
+<p>Any matching characters are silently removed before the text reaches PPA Tatip. If filtering happens to strip a plain-text announcement down to nothing at all, the add-on drops that announcement entirely rather than sending PPA Tatip an empty message. Should the filtering process itself ever fail for any reason, the add-on falls back to speaking the original, unfiltered text so that NVDA never goes silent because of this feature.</p>
+<br>
+<p>When NVDA shuts the add-on down, it restores NVDA's original speech function, unless another add-on has since layered its own patch on top, in which case PPAWakeUp leaves that patch alone so it is not accidentally erased.</p>
+</div>
 
-    <div class="section">
-        <h2>Why PPAWakeUp is a Must-Have:</h2>
-        <br>
-        <ul>
-            <li><strong>Zero Complexity:</strong> One hotkey to rule them all. Simple. Clean. Effective.</li>
-            <li><strong>Ultra-Lightweight:</strong> Optimized code that consumes near-zero system resources.</li>
-            <li><strong>Built for Professionals:</strong> Designed specifically for power users of the PPA Tatip Thai engine.</li>
-            <li><strong>Uninterrupted Workflow:</strong> Keep your hands on the keyboard and your mind on the task.</li>
-        </ul>
-    </div>
+<div class="feature-item">
+<h3>Dialog Button Crash Protection</h3>
+<p>When the "Protect against crash when focusing Open/OK/Save buttons in dialogs" setting is enabled, the add-on watches every object that gains focus. If a button with the name Open, OK, Save, or Yes (in English or Thai) receives focus, a 1.5 second watchdog timer starts.</p>
+<br>
+<p>When that timer fires, the add-on checks whether the PPA Tatip process is still running. If it has disappeared, the add-on concludes it crashed as a result of that button being focused and automatically starts the same wake-up sequence used by the single-tap Windows+P gesture, without any action needed from you.</p>
+</div>
 
-    <div class="section note">
-        <strong>Compatibility:</strong> Optimized for NVDA 2025.x and specifically engineered for systems with PPA Tatip installed.
-    </div>
+<div class="feature-item">
+<h3>Backup Tatip Dictionary</h3>
+<p>Copies PPA Tatip's userdict.txt from its interface folder into a dedicated backup location inside your NVDA configuration folder. You hear a confirmation message with the destination path and a success beep, or an error message and alert beep if the source file cannot be found or the copy fails.</p>
+</div>
 
-    <div class="section center">
-        <h3>Upgrade your NVDA workflow today with PPAWakeUp!</h3>
-    </div>
+<div class="feature-item">
+<h3>Restore Tatip Dictionary</h3>
+<p>Copies the previously backed-up userdict.txt back into PPA Tatip's interface folder, then automatically triggers the same wake-up sequence as a single Windows+P tap so PPA Tatip reloads with the restored dictionary. If no backup file exists yet, you are told to perform a backup first.</p>
+</div>
 
-    <br><br>
+<div class="feature-item">
+<h3>Open Tatip Folder</h3>
+<p>Opens PPA Tatip's interface folder directly in File Explorer, announcing "Tatip folder opened" on success, or an error message if the folder cannot be found.</p>
+</div>
+
+<div class="feature-item">
+<h3>Settings Storage</h3>
+<p>All three checkbox settings are stored as JSON in a settings.json file, inside a ChaiChaimee\PPAWakeUp subfolder of your NVDA configuration directory. If the file is missing or cannot be read, the add-on falls back to its defaults (all three protections enabled) without interrupting startup.</p>
+</div>
 
 </div>
 
+<br><br>
+<h2>Support Me</h2>
+    <p>If this tool has made your life easier, consider fueling the next update with a small donation.</p>
+<br>
+<p>
+  <a href="https://buy.stripe.com/dRm9AU1xQ3Ds22N6VK1VK01">
+    <img src="https://img.shields.io/badge/Donate-Support%20Me-blue?style=for-the-badge&logo=stripe" alt="Support me">
+  </a>
+</p>
+<br>
+<p>Your support means the world. Let's build something great together</p>
+<br>
+  <div class="footer-note">
+<p>&copy; 2026 Chai Chaimee NVDA Add-on Released under GNU GPL</p>
+</div>
+
+</div> <!-- End container -->
 </body>
 </html>

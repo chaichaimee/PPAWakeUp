@@ -1,14 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Complemento PPAWakeUp para NVDA</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+.container {
+    max-width: 800px;
+    margin: auto;
+    background: #fff;
+    padding: 20px 40px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+h1, h2, h3 {
+    text-align: center;
+}
+b {
+    font-weight: bold;
+}
+.section {
+    margin-bottom: 30px;
+}
+.nvda-logo {
+    display: block;
+    margin: 0 auto 20px;
+    width: 120px;
+    height: auto;
+}
+.hotkey {
+    background: #f8f9fa;
+    border-left: 4px solid #3498db;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 0 4px 4px 0;
+}
+.tap-explanation {
+    background: #e8f4fc;
+    padding: 15px;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+.feature-item {
+    margin: 15px 0;
+    padding-left: 10px;
+}
+.note {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 12px;
+    margin: 15px 0;
+    border-radius: 0 4px 4px 0;
+}
+</style>
+</head>
+<body>
+
 <div class="container">
-    <div class="section">
-        <img src="https://www.nvaccess.org/files/nvda/documentation/userGuide/images/nvda.ico" alt="NVDA Logo" class="nvda-logo">
-        <h1>PPAWakeUp</h1>
-        <p class="center"><b>¡Libera todo el potencial de PPA Tatip con una sola tecla inteligente!</b></p>
-    </div>
-    <div class="section">
-        <h2>Control sin interrupciones</h2>
-        <p>¿Cansado de que la voz se detenga? <strong>PPAWakeUp</strong> es el complemento revolucionario para NVDA diseñado para optimizar tu experiencia con el sintetizador tailandés PPA Tatip.</p>
-        <div class="hotkey"><strong>Windows+P (1 toque)</strong> → <b>¡Reanimación instantánea!</b> Reinicia el proceso si la voz se bloquea.</div>
-        <div class="hotkey"><strong>Windows+P (2 toques)</strong> → <b>Ajustes de precisión</b> Salta directamente a las opciones de configuración.</div>
-        <div class="hotkey"><strong>Windows+P (3 toques)</strong> → <b>Maestro del diccionario</b> Acceso rápido para editar palabras y pronunciación.</div>
-    </div>
+
+<div class="section">
+    <img src="https://www.nvaccess.org/files/nvda/documentation/userGuide/images/nvda.ico" alt="Logo de NVDA" class="nvda-logo">
+    <h1>PPAWakeUp</h1>
+    <br>
+    <p style="text-align: center;">Mantén PPA Tatip activo, silencioso y libre de fallos, directamente con Windows+P.</p>
 </div>
+<br>
+<div class="section">
+    <p style="text-align: center;"><b>Autor:</b> chai chaimee</p>
+    <p style="text-align: center;"><b>URL:</b> https://github.com/chaichaimee/PPAWakeUp</p>
+</div>
+<br>
+
+<div class="section">
+<h2>Introducción</h2>
+<p>PPAWakeUp es un complemento de NVDA creado para mantener el motor de lectura de pantalla de terceros PPA Tatip funcionando sin problemas junto con NVDA.</p>
+<br>
+<p>Se sabe que PPA Tatip deja de funcionar silenciosamente en ciertas condiciones, como cuando se le pide que lea ciertos caracteres de idiomas asiáticos, o cuando el botón de acción de un cuadro de diálogo de archivo (Abrir, Aceptar, Guardar, Sí) recibe el foco justo después de aparecer el diálogo. PPAWakeUp supervisa estas situaciones e interviene automáticamente, y también te ofrece una combinación de teclas única y familiar, Windows+P, para forzar el cierre y reiniciar PPA Tatip cada vez que necesite un nuevo comienzo.</p>
+<br>
+<p>Más allá de la recuperación ante fallos, el complemento incluye un pequeño menú para el mantenimiento diario de PPA Tatip: abrir su ventana de opciones, realizar copias de seguridad y restaurar tu diccionario personalizado, y ir directamente a su carpeta de instalación.</p>
+</div>
+<br>
+
+<div class="section">
+<h3>Atajos de teclado</h3>
+<div class="hotkey">
+<b>Windows+P</b><br>
+Pulsación simple : Activar PPA Tatip (forzar cierre y reiniciar)<br>
+Doble pulsación : Abrir opciones de PPA Tatip<br>
+Triple pulsación : Abrir el menú de gestión de PPA Tatip
+</div>
+<div class="tap-explanation">
+PPAWakeUp cuenta cuántas veces presionas Windows+P en rápida sucesión (dentro de medio segundo entre cada pulsación). Espera brevemente tras la última pulsación para ver si viene otra, y luego ejecuta la acción correspondiente al recuento final: una pulsación activa PPA Tatip, dos pulsaciones abren su ventana de opciones y tres o más pulsaciones abren el menú de gestión.
+</div>
+<div class="note">
+Este gesto se intercepta a bajo nivel para que, independientemente del recuento de pulsaciones utilizado, NVDA también fuerce la liberación de la tecla Windows después. Esto evita que Windows considere que la tecla sigue presionada, lo que de otro modo te impediría escribir la letra "p" hasta reiniciar.
+</div>
+</div>
+<br>
+
+<div class="section">
+<h2>Características</h2>
+
+<div class="feature-item">
+<h3>Activar PPA Tatip (Pulsación simple)</h3>
+<p>Una sola pulsación de Windows+P fuerza el cierre de cualquier copia en ejecución de PPA Tatip y la reinicia. Esta es la acción principal de recuperación para cuando PPA Tatip se ha bloqueado o ha dejado de responder.</p>
+<br>
+<p>Paso a paso, al pulsar una vez Windows+P:</p>
+<br>
+<p>1. NVDA anuncia "Wake up" y emite un pitido grave corto.<br>
+2. El complemento localiza windows_tatip.exe, comprobando primero la ruta de instalación estándar en Local AppData y luego Program Files y Program Files (x86) como alternativas.<br>
+3. Si no se encuentra el ejecutable en ninguna parte, escuchas un mensaje de error y un pitido de alerta, y el intento se detiene.<br>
+4. El complemento intenta forzar el cierre de cualquier proceso existente de PPA Tatip, primero con taskkill, luego, si no se confirma que el proceso ha desaparecido, con Stop-Process de PowerShell, y finalmente con wmic como último recurso.<br>
+5. PPA Tatip se vuelve a ejecutar. Luego, el complemento comprueba de forma periódica si el proceso aparece realmente en la lista de tareas en ejecución, esperando hasta unos 2,5 segundos por intento.<br>
+6. Si el reinicio no se confirma dentro de ese tiempo, el complemento reintenta automáticamente (hasta tres intentos en total de forma predeterminada, o solo un intento si el reintento automático se ha desactivado en la configuración).<br>
+7. Si PPA Tatip aún no se ha confirmado después de todos los intentos, escuchas un mensaje pidiéndote que intentes de nuevo Windows+P, junto con un pitido de alerta.</p>
+<br>
+<p>Si acabas de activar PPA Tatip con éxito en los últimos 3 segundos, presionar Windows+P de nuevo se considera innecesario: NVDA te informa de que PPA Tatip ya está activo y emite un pitido corto, en lugar de cerrar un proceso que acaba de iniciar.</p>
+<br>
+<p>Todo este trabajo se realiza en un hilo en segundo plano, por lo que NVDA nunca se congela mientras se reinicia PPA Tatip, y las pulsaciones repetidas mientras ya se está procesando una activación se responden con un mensaje de "por favor espera" en lugar de iniciar un segundo intento.</p>
+</div>
+
+<div class="feature-item">
+<h3>Abrir opciones de PPA Tatip (Doble pulsación)</h3>
+<p>Al pulsar dos veces Windows+P, busca openoption.exe dentro de la carpeta de interfaz de PPA Tatip en tu perfil de usuario y lo ejecuta, anunciando "Opción" mientras lo hace. Si no se encuentra el archivo, escuchas un mensaje de error y un pitido de alerta.</p>
+</div>
+
+<div class="feature-item">
+<h3>Menú de gestión de PPA Tatip (Triple pulsación)</h3>
+<p>Al pulsar tres veces Windows+P, se abre una pequeña ventana flotante con una lista de cuatro opciones: Configuración del lector Tatip (Tatip reader setting), Respaldar diccionario de Tatip (Backup Tatip dictionary), Restaurar diccionario de Tatip (Restore Tatip dictionary) y Abrir carpeta de Tatip (Open Tatip folder).</p>
+<br>
+<p>La ventana del menú se puede manejar completamente desde el teclado: presiona Enter para activar el elemento resaltado o Escape para cerrar el menú sin seleccionar nada. También se cierra automáticamente si se deja sin tocar durante 15 segundos, y ese temporizador se reinicia cada vez que presionas una tecla dentro de él.</p>
+</div>
+
+<div class="feature-item">
+<h3>Diálogo de configuración del lector Tatip</h3>
+<p>Abierto desde el menú de gestión, este diálogo ofrece tres casillas de verificación que controlan los comportamientos de protección del complemento:</p>
+<br>
+<p>- Omitir caracteres chinos, japoneses y coreanos al leer<br>
+- Proteger contra fallos al enfocar los botones Abrir/Aceptar/Guardar en los diálogos<br>
+- Reintentar automáticamente la activación si PPA Tatip no se inicia</p>
+<br>
+<p>Las tres opciones están activadas de forma predeterminada. Las selecciones se guardan tan pronto como haces clic en Aceptar y se recargan automáticamente la próxima vez que se inicia NVDA.</p>
+</div>
+
+<div class="feature-item">
+<h3>Filtrado automático de voz para caracteres con problemas</h3>
+<p>PPAWakeUp se instala antes de la propia salida de voz de NVDA. Cuando la opción "Omitir caracteres chinos, japoneses y coreanos al leer" está activada, cada fragmento de texto que NVDA va a decir se comprueba carácter por carácter con una gran tabla de rangos Unicode conocidos por provocar fallos en PPA Tatip, cubriendo ideogramas CJK, hiragana, katakana, hangul, bopomofo y varias escrituras relacionadas.</p>
+<br>
+<p>Cualquier carácter coincidente se elimina silenciosamente antes de que el texto llegue a PPA Tatip. Si el filtrado elimina por completo un anuncio de texto plano, el complemento descarta ese anuncio por completo en lugar de enviar un mensaje vacío a PPA Tatip. Si el proceso de filtrado falla por cualquier motivo, el complemento vuelve a pronunciar el texto original sin filtrar para que NVDA nunca se quede en silencio debido a esta función.</p>
+<br>
+<p>Cuando NVDA desactiva el complemento, se restaura la función de voz original de NVDA, a menos que otro complemento haya superpuesto su parche posteriormente, en cuyo caso PPAWakeUp deja ese parche intacto para que no se elimine accidentalmente.</p>
+</div>
+
+<div class="feature-item">
+<h3>Protección contra fallos en botones de diálogo</h3>
+<p>Cuando la opción "Proteger contra fallos al enfocar los botones Abrir/Aceptar/Guardar en los diálogos" está activada, el complemento supervisa cada objeto que recibe el foco. Si un botón con el nombre Abrir, OK/Aceptar, Guardar o Sí (en inglés o tailandés) recibe el foco, se inicia un temporizador de supervisión de 1,5 segundos.</p>
+<br>
+<p>Cuando ese temporizador se activa, el complemento comprueba si el proceso de PPA Tatip sigue en ejecución. Si ha desaparecido, el complemento concluye que se bloqueó a causa del foco en ese botón e inicia automáticamente la misma secuencia de activación que el gesto de pulsación simple Windows+P, sin requerir ninguna acción por tu parte.</p>
+</div>
+
+<div class="feature-item">
+<h3>Respaldar diccionario de Tatip</h3>
+<p>Copia el archivo userdict.txt de PPA Tatip desde su carpeta de interfaz a una ubicación de copia de seguridad dedicada dentro de la carpeta de configuración de NVDA. Escuchas un mensaje de confirmación con la ruta de destino y un pitido de éxito, o un mensaje de error y un pitido de alerta si no se encuentra el archivo de origen o falla la copia.</p>
+</div>
+
+<div class="feature-item">
+<h3>Restaurar diccionario de Tatip</h3>
+<p>Copia el archivo userdict.txt respaldado previamente de nuevo en la carpeta de interfaz de PPA Tatip y, a continuación, desencadena automáticamente la misma secuencia de activación que una pulsación simple de Windows+P para que PPA Tatip se recargue con el diccionario restaurado. Si aún no existe ningún archivo de copia de seguridad, se te pedirá que realices una copia de seguridad primero.</p>
+</div>
+
+<div class="feature-item">
+<h3>Abrir carpeta de Tatip</h3>
+<p>Abre la carpeta de interfaz de PPA Tatip directamente en el Explorador de archivos, anunciando "Carpeta de Tatip abierta" si tiene éxito, o un mensaje de error si no se encuentra la carpeta.</p>
+</div>
+
+<div class="feature-item">
+<h3>Almacenamiento de configuración</h3>
+<p>Las tres casillas de verificación se almacenan en formato JSON en un archivo settings.json, dentro de la subcarpeta ChaiChaimee\PPAWakeUp de tu directorio de configuración de NVDA. Si el archivo no existe o no se puede leer, el complemento recurre a sus valores predeterminados (las tres protecciones activadas) sin interrumpir el inicio.</p>
+</div>
+
+</div>
+
+<br><br>
+<h2>Apóyame</h2>
+    <p>Si esta herramienta te ha facilitado la vida, considera apoyar la próxima actualización con una pequeña donación.</p>
+<br>
+<p>
+  <a href="https://buy.stripe.com/dRm9AU1xQ3Ds22N6VK1VK01">
+    <img src="https://img.shields.io/badge/Donate-Support%20Me-blue?style=for-the-badge&logo=stripe" alt="Apóyame">
+  </a>
+</p>
+<br>
+<p>Tu apoyo significa mucho. Construyamos algo grandioso juntos</p>
+<br>
+  <div class="footer-note">
+<p>&copy; 2026 Chai Chaimee Complemento para NVDA publicado bajo GNU GPL</p>
+</div>
+
+</div> <!-- End container -->
+</body>
+</html>

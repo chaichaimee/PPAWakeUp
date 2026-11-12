@@ -2,99 +2,140 @@
 
 # PPAWakeUp
 
-Keep PPA Tatip awake, quiet, and crash-free, right from Windows+P.
+Wake PPA Tatip up whenever it stops, keep it safe from crashes, and manage its dictionary with ease.
 
-**author:** chai chaimee  
+**author:** chai chaimee
+
 **url:** https://github.com/chaichaimee/PPAWakeUp
 
 ## Introduction
 
-PPAWakeUp is an NVDA add-on built to keep the third-party screen reading engine PPA Tatip running smoothly alongside NVDA.
+PPAWakeUp keeps the PPA Tatip Thai voice working smoothly with NVDA. When Tatip stops speaking or crashes, one key press restarts it and gets you reading again. The add-on also stops the characters and dialog buttons that are known to freeze Tatip from reaching it, lets you back up and restore your personal dictionary, and includes a full dictionary editor so you can add and correct words without leaving NVDA.
 
-PPA Tatip is known to silently stop working under certain conditions, such as when it is asked to speak certain Asian-language characters, or when a file dialog's action button (Open, OK, Save, Yes) receives focus right after the dialog appears. PPAWakeUp watches for these situations and steps in automatically, and it also gives you a single, familiar key press, Windows+P, to force-kill and relaunch PPA Tatip whenever it needs a fresh start.
+## Hot Keys
 
-Beyond crash recovery, the add-on bundles a small menu for everyday PPA Tatip maintenance: opening its options window, backing up and restoring your custom dictionary, and jumping straight to its installation folder.
+**Windows+P**
 
-### Hot Keys
-
-**Windows+P**  
-Single Tap : Wake up PPA Tatip (force-kill and relaunch it)  
-Double Tap : Open PPA Tatip options  
-Triple Tap : Open the PPA Tatip management menu  
-
-PPAWakeUp counts how many times you press Windows+P in quick succession (within half a second of each press). It waits briefly after your last tap to see if another one is coming, then runs the action for the final tap count: one tap wakes PPA Tatip up, two taps opens its options window, and three or more taps opens the management menu.
-
-> **Note:** This gesture is intercepted at a low level so that, whichever tap count you use, NVDA also forces the Windows key back up afterwards. This prevents Windows from thinking the key is still held down, which would otherwise block you from typing the letter "p" until you restart.
+- Single Tap : Wake up PPA Tatip
+- Double Tap : Open the Tatip dictionary editor
+- Triple Tap : Open the Tatip menu
 
 ## Features
 
-### Wake Up PPA Tatip (Single Tap)
+### Wake Up PPA Tatip
 
-A single Windows+P press force-kills any running copy of PPA Tatip and starts a fresh one. This is the main recovery action for when PPA Tatip has crashed or stopped responding.
+Press Windows+P once to restart PPA Tatip. NVDA says "Wake up" and plays a beep, then the add-on closes any running Tatip process, including a stuck one, and starts a fresh copy. It finds Tatip in your local Programs folder or in Program Files.
 
-Step by step, when you single-tap Windows+P:
+If Tatip does not start on the first try, the add-on tries again, up to three attempts in total. You can turn this retry off in the Tatip reader setting. If Tatip was only just started successfully and you press the key again, NVDA says "PPA Tatip is already awake" instead of restarting it, so an impatient second press can never kill a Tatip that is still starting. If a restart is already in progress, NVDA asks you to wait.
 
-1. NVDA announces "Wake up" and plays a short low beep.
-2. The add-on locates windows_tatip.exe, checking the standard Local AppData install path first, then Program Files and Program Files (x86) as fallbacks.
-3. If the executable cannot be found anywhere, you hear an error message and an alert beep, and the attempt stops.
-4. The add-on tries to force-kill any existing PPA Tatip process, first with taskkill, then, if that does not confirm the process is gone, with PowerShell's Stop-Process, and finally with wmic as a last resort.
-5. PPA Tatip is relaunched. The add-on then polls to confirm the process actually appears in the running task list, waiting up to about 2.5 seconds per attempt.
-6. If the relaunch does not confirm within that time, the add-on retries automatically (up to three attempts in total by default, or only one attempt if automatic retry has been turned off in settings).
-7. If PPA Tatip still has not confirmed after all attempts, you hear a message asking you to try Windows+P again, along with an alert beep.
+Different beeps tell you what happened: an error beep when Tatip cannot be found or does not confirm startup, and a higher beep when a backup, restore or dictionary save succeeds.
 
-If you have just successfully woken PPA Tatip up within the last 3 seconds, pressing Windows+P again is treated as unnecessary: NVDA tells you PPA Tatip is already awake and plays a short beep, rather than killing a process that only just finished starting.
+The add-on also releases the Windows and P keys after the gesture, so Windows does not open its own Project panel on your next press of the letter P.
 
-All of this work happens on a background thread, so NVDA itself never freezes while PPA Tatip is being restarted, and repeated presses while a wake-up is already underway are answered with a "please wait" message instead of starting a second attempt.
+**Step by step:**
 
-### Open PPA Tatip Options (Double Tap)
+1. Press Windows+P once.
+2. Listen for "Wake up" and the beep.
+3. Wait a moment while Tatip restarts. Tatip starts speaking again.
 
-Double-tapping Windows+P looks for openoption.exe inside PPA Tatip's interface folder under your user profile and launches it, announcing "Option" as it does. If the file cannot be found, you hear an error message and an alert beep.
+### CJK Character Speech Filter
 
-### PPA Tatip Management Menu (Triple Tap)
-
-Triple-tapping Windows+P opens a small floating list-box window with four choices: Tatip reader setting, Backup Tatip dictionary, Restore Tatip dictionary, and Open Tatip folder.
-
-The menu window can be operated entirely from the keyboard: press Enter to activate the highlighted item, or Escape to close the menu without choosing anything. It also closes itself automatically if left untouched for 15 seconds, and that timeout resets every time you press a key inside it.
-
-### Tatip Reader Setting Dialog
-
-Opened from the management menu, this dialog offers three checkboxes that control the add-on's protective behaviors:
-
-- Skip Chinese, Japanese and Korean characters when speaking
-- Protect against crash when focusing Open/OK/Save buttons in dialogs
-- Automatically retry wake up if PPA Tatip does not start
-
-All three options are enabled by default. Choices are saved as soon as you click OK, and are reloaded automatically the next time NVDA starts.
-
-### Automatic Speech Filtering for Problem Characters
-
-PPAWakeUp installs itself in front of NVDA's own speech output. When the "Skip Chinese, Japanese and Korean characters when speaking" setting is enabled, every piece of text NVDA is about to speak is checked character by character against a large table of Unicode ranges known to make PPA Tatip stop working, covering CJK ideographs, Hiragana, Katakana, Hangul, Bopomofo, and several related scripts.
-
-Any matching characters are silently removed before the text reaches PPA Tatip. If filtering happens to strip a plain-text announcement down to nothing at all, the add-on drops that announcement entirely rather than sending PPA Tatip an empty message. Should the filtering process itself ever fail for any reason, the add-on falls back to speaking the original, unfiltered text so that NVDA never goes silent because of this feature.
-
-When NVDA shuts the add-on down, it restores NVDA's original speech function, unless another add-on has since layered its own patch on top, in which case PPAWakeUp leaves that patch alone so it is not accidentally erased.
+Chinese, Japanese and Korean characters can make PPA Tatip stop working. While this filter is on, the add-on removes those characters from everything NVDA is about to speak. If nothing is left after filtering, that speech is dropped instead of being sent to Tatip. If the filter itself ever fails, NVDA speaks the original text normally so you are never left in silence.
 
 ### Dialog Button Crash Protection
 
-When the "Protect against crash when focusing Open/OK/Save buttons in dialogs" setting is enabled, the add-on watches every object that gains focus. If a button with the name Open, OK, Save, or Yes (in English or Thai) receives focus, a 1.5 second watchdog timer starts.
+Tatip can crash silently when focus lands on the Open, OK, Save or Yes button, or the Thai equivalents, right after a file dialog appears. When one of these buttons receives focus, the add-on checks shortly afterwards that Tatip is still running. If Tatip has disappeared, it is restarted automatically.
 
-When that timer fires, the add-on checks whether the PPA Tatip process is still running. If it has disappeared, the add-on concludes it crashed as a result of that button being focused and automatically starts the same wake-up sequence used by the single-tap Windows+P gesture, without any action needed from you.
+### Tatip Menu
 
-### Backup Tatip Dictionary
+Press Windows+P three times to open a small window with a list of actions. Use the arrow keys to choose, Enter to run the action, and Escape to close. The menu closes by itself after a short period without use. The actions are:
 
-Copies PPA Tatip's userdict.txt from its interface folder into a dedicated backup location inside your NVDA configuration folder. You hear a confirmation message with the destination path and a success beep, or an error message and alert beep if the source file cannot be found or the copy fails.
+- Open Tatip options: starts the PPA Tatip options program.
+- Tatip reader setting: opens the settings window described below.
+- Backup Tatip dictionary: copies userdict.txt to a safe folder.
+- Restore Tatip dictionary: copies your backup back and restarts Tatip.
+- Open Tatip folder: opens the PPA Tatip interface folder in Windows Explorer.
+- Diagnostics: dump Tatip windows: saves a read-only list of the open Tatip windows to a text file, for troubleshooting. Nothing in Tatip is changed.
 
-### Restore Tatip Dictionary
+### Tatip Reader Setting
 
-Copies the previously backed-up userdict.txt back into PPA Tatip's interface folder, then automatically triggers the same wake-up sequence as a single Windows+P tap so PPA Tatip reloads with the restored dictionary. If no backup file exists yet, you are told to perform a backup first.
+This window has three check boxes, and all of them are on by default:
 
-### Open Tatip Folder
+- Skip Chinese, Japanese and Korean characters when speaking.
+- Protect against crash when focusing Open/OK/Save buttons in dialogs.
+- Automatically retry wake up if PPA Tatip does not start.
 
-Opens PPA Tatip's interface folder directly in File Explorer, announcing "Tatip folder opened" on success, or an error message if the folder cannot be found.
+Press OK to save your choices, or Cancel to discard them. Your choices are remembered between NVDA sessions.
 
-### Settings Storage
+**Step by step:**
 
-All three checkbox settings are stored as JSON in a settings.json file, inside a ChaiChaimee\PPAWakeUp subfolder of your NVDA configuration directory. If the file is missing or cannot be read, the add-on falls back to its defaults (all three protections enabled) without interrupting startup.
+1. Press Windows+P three times.
+2. Choose Tatip reader setting and press Enter.
+3. Tick or untick the options you want.
+4. Press OK.
+
+### Backup and Restore the Dictionary
+
+Backup Tatip dictionary copies your PPA Tatip userdict.txt into a ChaiChaimee, PPAWakeUp folder inside your NVDA configuration folder. NVDA reports the full path when the backup is done. Restore Tatip dictionary copies that backup over the current userdict.txt, says "Dictionary restored. Reloading PPA Tatip", and restarts Tatip so the restored words take effect. If no backup exists yet, NVDA tells you to make one first.
+
+**Step by step:**
+
+1. Press Windows+P three times.
+2. Choose Backup Tatip dictionary and press Enter. Wait for the backup confirmation.
+3. Later, to go back to that copy, open the menu again, choose Restore Tatip dictionary and press Enter.
+
+### Tatip Dictionary Editor
+
+Press Windows+P twice to open the PPA Tatip Dictionary Editor, which works directly on the Tatip userdict.txt file. The word list shows each entry as the word, its reading, and its line number. Press Enter on a word to edit it.
+
+- Search: type in the Search box to filter the list by word or reading. NVDA announces how many results were found.
+- Add: opens a dialog with a Pattern field (the word as written) and a Replacement field (its reading).
+- Edit: changes the pattern or the reading of the selected word.
+- Remove: deletes the selected word from the list.
+- Move to line: type a line number to move the selected word to that line when you press Apply or OK.
+- Apply saves your changes and keeps the window open. OK saves and closes. Cancel or Escape closes the window, and asks first if there are unsaved changes.
+
+Changes stay in the editor until you press Apply or OK, and NVDA reminds you of this after every add, edit or remove. Lines of the file that do not follow the standard word layout are left out of the list and are always saved back unchanged.
+
+The reading can contain marker words in parentheses, such as (half), (short) or (long). The allowed markers are half, short, long, samun, ake, tho, three, jutthawa, -d, -f, -k, -l, -s, -sh, -t, +s, +es and +ed, and several can share one pair of parentheses, for example (half three). The editor rejects an entry that is empty, contains a double quote, a line break or a colon in the reading, has unmatched parentheses or an unknown marker, or holds a character the dictionary file cannot store, and puts you back in the field that needs fixing.
+
+### Adding and Changing Words
+
+Every word in the Tatip dictionary needs a pronunciation code, and only PPA Tatip itself can create it. For that reason, new words and words whose reading you changed are handed over to PPA Tatip automatically when you press Apply or OK. The add-on opens the Tatip options window, presses Dictionary and Add, enters each word and its reading, confirms, and finally confirms the dictionary window so that Tatip saves the file itself. NVDA says how many words are being sent and asks you to wait.
+
+Words that already have a pronunciation code, such as ones you only moved, removed, or renamed without changing the reading, are written to the file directly. Before every direct save, the previous file is kept as userdict_before_edit.txt in the backup folder.
+
+When everything has been saved, NVDA says "Dictionary saved" or "Dictionary saved by PPA Tatip" with a beep, and Tatip is restarted so it reads the new words. If Tatip did not save a word, the editor lists the words that failed and keeps your changes so you can try again.
+
+Handing words to Tatip needs three things: Windows must use the Thai language for non-Unicode programs, PPA Tatip must be running (press Windows+P first), and the Tatip dictionary window must not already be open.
+
+**Step by step:**
+
+1. Press Windows+P to make sure PPA Tatip is running.
+2. Press Windows+P twice to open the dictionary editor.
+3. Choose Add, type the word in Pattern and its reading in Replacement, then press OK.
+4. Repeat for any other words. Each one is shown in the list.
+5. Press Apply, or OK to save and close.
+6. Wait while NVDA reports that the words are being sent to PPA Tatip.
+7. Listen for "Dictionary saved by PPA Tatip". Tatip restarts and the new words are ready.
+
+### Reorder Words
+
+Order matters in a dictionary, and the editor lets you place a word on an exact line.
+
+**Step by step:**
+
+1. In the editor, select the word you want to move in the list.
+2. Press Tab to reach the Move to line field and type the new line number. It must be between 1 and the number of lines in the file.
+3. Press Apply or OK. NVDA says "Moved to line" followed by the number, and the word stays selected.
+
+### Smooth Reading in Tatip Windows
+
+The add-on includes special handling for the PPA Tatip programs, windows_tatip and ttsapp. NVDA does not probe their windows with UI Automation, which prevents NVDA from freezing while Tatip is busy. Their windows are read through the standard accessibility interface instead. This works in the background and needs no setup.
+
+### Changing the Hot Key
+
+The Windows+P gesture appears in NVDA's Input Gestures dialog under the PPAWakeUp category, where you can assign a different key if you prefer.
 
 ## Support Me
 
@@ -104,6 +145,4 @@ If this tool has made your life easier, consider fueling the next update with a 
 
 Your support means the world. Let's build something great together
 
----
-
-&copy; 2026 Chai Chaimee NVDA Add-on Released under GNU GPL
+© 2026 Chai Chaimee NVDA Add-on Released under GNU GPL

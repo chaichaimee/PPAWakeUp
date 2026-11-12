@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: PPAWakeUp 2026.9.9\n"
+"Project-Id-Version: PPAWakeUp 2026.11.0\n"
 "Report-Msgid-Bugs-To: chaicm75@gmail.com\n"
-"POT-Creation-Date: 2026-09-11 08:27+0700\n"
+"POT-Creation-Date: 2026-11-12 15:10+0700\n"
 "PO-Revision-Date: \n"
 "Last-Translator: chaiBot and Malee Yamazaki\n"
 "Language-Team: English\n"
@@ -10,126 +10,373 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: DevOn Addon\n"
+"X-Generator: ChaiBot Addon\n"
 
-#: ppaWakeUpCore.py:503
+#: userDictEditor.py:265
+msgid "&Add"
+msgstr "&Add"
+
+#: userDictEditor.py:266
+msgid "&Edit"
+msgstr "&Edit"
+
+#: userDictEditor.py:261
+msgid "&Move to line:"
+msgstr "&Move to line:"
+
+#: userDictEditor.py:200
+msgid "&Pattern:"
+msgstr "&Pattern:"
+
+#: userDictEditor.py:267
+msgid "&Remove"
+msgstr "&Remove"
+
+#: userDictEditor.py:203
+msgid "&Replacement (reading, markers in parentheses such as (half), (short), (long)):"
+msgstr "&Replacement (reading, markers in parentheses such as (half), (short), (long)):"
+
+#: userDictEditor.py:256
+msgid "&Search:"
+msgstr "&Search:"
+
+#: userDictEditor.py:367
+msgid "Add Tatip dictionary word"
+msgstr "Add Tatip dictionary word"
+
+#: ppaWakeUpCore.py:539
 msgid "Already trying to wake up PPA Tatip, please wait"
 msgstr "Already trying to wake up PPA Tatip, please wait"
 
-#: ppaWakeUpCore.py:227
+#: ppaWakeUpCore.py:242
 msgid "Automatically retry wake up if PPA Tatip does not start"
 msgstr "Automatically retry wake up if PPA Tatip does not start"
 
-#: ppaWakeUpCore.py:576
+#: ppaWakeUpCore.py:613
 msgid "Backup Tatip dictionary"
 msgstr "Backup Tatip dictionary"
 
-#: ppaWakeUpCore.py:610
+#: ppaWakeUpCore.py:742
 msgid "Backup completed: {dest}"
 msgstr "Backup completed: {dest}"
 
-#: ppaWakeUpCore.py:613
+#: ppaWakeUpCore.py:745
 msgid "Backup failed: file not written to {dest}"
 msgstr "Backup failed: file not written to {dest}"
 
-#: ppaWakeUpCore.py:616
+#: ppaWakeUpCore.py:748
 msgid "Backup failed: {error}"
 msgstr "Backup failed: {error}"
 
-#: ppaWakeUpCore.py:633
+#: tatipDictionaryDriver.py:128
+msgid "Close the PPA Tatip dictionary window first"
+msgstr "Close the PPA Tatip dictionary window first"
+
+#: ppaWakeUpCore.py:616
+msgid "Diagnostics: dump Tatip windows"
+msgstr "Diagnostics: dump Tatip windows"
+
+#: userDictEditor.py:259
+msgid "Dictionary &words"
+msgstr "Dictionary &words"
+
+#: ppaWakeUpCore.py:765
 msgid "Dictionary restored. Reloading PPA Tatip..."
 msgstr "Dictionary restored. Reloading PPA Tatip..."
 
-#: ppaWakeUpCore.py:566
+#: userDictEditor.py:506
+msgid "Dictionary saved"
+msgstr "Dictionary saved"
+
+#: userDictEditor.py:537
+msgid "Dictionary saved by PPA Tatip"
+msgstr "Dictionary saved by PPA Tatip"
+
+#: userDictEditor.py:388
+msgid "Edit Tatip dictionary word"
+msgstr "Edit Tatip dictionary word"
+
+#: userDictEditor.py:440
+msgid "Enter a line number from 1 to {count}"
+msgstr "Enter a line number from 1 to {count}"
+
+#: ppaWakeUpCore.py:644
+msgid "Error: Failed to dump Tatip windows - {error}"
+msgstr "Error: Failed to dump Tatip windows - {error}"
+
+#: ppaWakeUpCore.py:602
 msgid "Error: Failed to open PPA Tatip options - {error}"
 msgstr "Error: Failed to open PPA Tatip options - {error}"
 
-#: ppaWakeUpCore.py:627
+#: ppaWakeUpCore.py:674
+msgid "Error: Failed to open the dictionary - {error}"
+msgstr "Error: Failed to open the dictionary - {error}"
+
+#: ppaWakeUpCore.py:759
 msgid "Error: No backup file found. Please perform a backup first."
 msgstr "Error: No backup file found. Please perform a backup first."
 
-#: ppaWakeUpCore.py:649
+#: ppaWakeUpCore.py:781
 msgid "Error: Tatip folder not found."
 msgstr "Error: Tatip folder not found."
 
-#: ppaWakeUpCore.py:559
+#: ppaWakeUpCore.py:638
+msgid "Error: no PPA Tatip window was found. Open the Tatip dictionary window first."
+msgstr "Error: no PPA Tatip window was found. Open the Tatip dictionary window first."
+
+#: ppaWakeUpCore.py:595
+#: ppaWakeUpCore.py:693
 msgid "Error: openoption.exe not found. Please ensure PPA Tatip is installed."
 msgstr "Error: openoption.exe not found. Please ensure PPA Tatip is installed."
 
-#: ppaWakeUpCore.py:602
+#: ppaWakeUpCore.py:734
 msgid "Error: userdict.txt not found at source location."
 msgstr "Error: userdict.txt not found at source location."
 
-#: ppaWakeUpCore.py:511
+#: ppaWakeUpCore.py:660
+msgid "Error: userdict.txt not found. Please ensure PPA Tatip is installed."
+msgstr "Error: userdict.txt not found. Please ensure PPA Tatip is installed."
+
+#: ppaWakeUpCore.py:547
 msgid "Error: windows_tatip.exe not found. Please ensure PPA Tatip is installed."
 msgstr "Error: windows_tatip.exe not found. Please ensure PPA Tatip is installed."
 
-#: ppaWakeUpCore.py:655
+#: ppaWakeUpCore.py:787
 msgid "Failed to open folder: {error}"
 msgstr "Failed to open folder: {error}"
 
-#: ppaWakeUpCore.py:578
+#: userDictEditor.py:221
+msgid "Invalid entry"
+msgstr "Invalid entry"
+
+#: userDictEditor.py:442
+msgid "Invalid line number"
+msgstr "Invalid line number"
+
+#: userDictEditor.py:465
+msgid "Moved to line {line}"
+msgstr "Moved to line {line}"
+
+#: userDictEditor.py:486
+msgid "No changes to save"
+msgstr "No changes to save"
+
+#: userDictEditor.py:384
+#: userDictEditor.py:417
+#: userDictEditor.py:451
+msgid "No word is selected"
+msgstr "No word is selected"
+
+#: ppaWakeUpCore.py:615
 msgid "Open Tatip folder"
 msgstr "Open Tatip folder"
 
-#: ppaWakeUpCore.py:563
+#: ppaWakeUpCore.py:611
+msgid "Open Tatip options"
+msgstr "Open Tatip options"
+
+#: ppaWakeUpCore.py:599
 msgid "Option"
 msgstr "Option"
 
-#: ppaWakeUpCore.py:539
+#: userDictEditor.py:238
+msgid "PPA Tatip Dictionary Editor"
+msgstr "PPA Tatip Dictionary Editor"
+
+#: tatipDictionaryDriver.py:103
+msgid "PPA Tatip changed the text that was entered"
+msgstr "PPA Tatip changed the text that was entered"
+
+#: tatipDictionaryDriver.py:100
+msgid "PPA Tatip did not accept the text"
+msgstr "PPA Tatip did not accept the text"
+
+#: ppaWakeUpCore.py:575
 msgid "PPA Tatip did not confirm startup. Please try Windows+P again."
 msgstr "PPA Tatip did not confirm startup. Please try Windows+P again."
 
-#: ppaWakeUpCore.py:497
+#: tatipDictionaryDriver.py:85
+msgid "PPA Tatip did not respond while {step}"
+msgstr "PPA Tatip did not respond while {step}"
+
+#: userDictEditor.py:552
+msgid "PPA Tatip did not save the words"
+msgstr "PPA Tatip did not save the words"
+
+#: userDictEditor.py:545
+msgid "PPA Tatip did not save these words with a pronunciation code: {words}"
+msgstr "PPA Tatip did not save these words with a pronunciation code: {words}"
+
+#: ppaWakeUpCore.py:533
 msgid "PPA Tatip is already awake"
 msgstr "PPA Tatip is already awake"
 
-#: ppaWakeUpCore.py:128
-#: ppaWakeUpCore.py:188
-#: ppaWakeUpCore.py:581
+#: tatipDictionaryDriver.py:125
+msgid "PPA Tatip is not running. Press Windows+P to wake it up first"
+msgstr "PPA Tatip is not running. Press Windows+P to wake it up first"
+
+#: tatipDictionaryDriver.py:77
+msgid "PPA Tatip window changed: button not found while {step}"
+msgstr "PPA Tatip window changed: button not found while {step}"
+
+#: tatipDictionaryDriver.py:145
+msgid "PPA Tatip window changed: the Add button was not found"
+msgstr "PPA Tatip window changed: the Add button was not found"
+
+#: tatipDictionaryDriver.py:95
+msgid "PPA Tatip word window has {count} edit boxes instead of 2"
+msgstr "PPA Tatip word window has {count} edit boxes instead of 2"
+
+#: ppaWakeUpCore.py:143
+#: ppaWakeUpCore.py:203
+#: ppaWakeUpCore.py:619
 msgid "PPA Tatip – Menu"
 msgstr "PPA Tatip – Menu"
 
-#: ppaWakeUpCore.py:277
+#: ppaWakeUpCore.py:292
 msgid "PPAWakeUp"
 msgstr "PPAWakeUp"
 
-#: ppaWakeUpCore.py:219
+#: userDictEditor.py:349
+msgid "Please wait, PPA Tatip is saving the words"
+msgstr "Please wait, PPA Tatip is saving the words"
+
+#: ppaWakeUpCore.py:234
 msgid "Protect against crash when focusing Open/OK/Save buttons in dialogs"
 msgstr "Protect against crash when focusing Open/OK/Save buttons in dialogs"
 
-#: ppaWakeUpCore.py:577
+#: ppaWakeUpCore.py:614
 msgid "Restore Tatip dictionary"
 msgstr "Restore Tatip dictionary"
 
-#: ppaWakeUpCore.py:638
+#: ppaWakeUpCore.py:770
 msgid "Restore failed: {error}"
 msgstr "Restore failed: {error}"
 
-#: ppaWakeUpCore.py:211
+#: userDictEditor.py:499
+msgid "Save failed"
+msgstr "Save failed"
+
+#: userDictEditor.py:515
+msgid "Sending {count} words to PPA Tatip, please wait"
+msgstr "Sending {count} words to PPA Tatip, please wait"
+
+#: ppaWakeUpCore.py:226
 msgid "Skip Chinese, Japanese and Korean characters when speaking"
 msgstr "Skip Chinese, Japanese and Korean characters when speaking"
 
-#: ppaWakeUpCore.py:196
+#: ppaWakeUpCore.py:211
 msgid "Tatip Reader Setting"
 msgstr "Tatip Reader Setting"
 
-#: ppaWakeUpCore.py:653
+#: ppaWakeUpCore.py:785
 msgid "Tatip folder opened"
 msgstr "Tatip folder opened"
 
-#: ppaWakeUpCore.py:575
+#: ppaWakeUpCore.py:612
 msgid "Tatip reader setting"
 msgstr "Tatip reader setting"
 
-#: ppaWakeUpCore.py:542
+#: ppaWakeUpCore.py:642
+msgid "Tatip window dump saved"
+msgstr "Tatip window dump saved"
+
+#: tatipDictionaryDriver.py:140
+msgid "The PPA Tatip dictionary window did not appear"
+msgstr "The PPA Tatip dictionary window did not appear"
+
+#: tatipDictionaryDriver.py:134
+msgid "The PPA Tatip options window did not appear"
+msgstr "The PPA Tatip options window did not appear"
+
+#: tatipDictionaryDriver.py:150
+msgid "The PPA Tatip word window did not appear"
+msgstr "The PPA Tatip word window did not appear"
+
+#: userDictEditor.py:497
+msgid "The dictionary could not be saved: {error}"
+msgstr "The dictionary could not be saved: {error}"
+
+#: userDictEditor.py:159
+msgid "The pattern must not be empty"
+msgstr "The pattern must not be empty"
+
+#: userDictEditor.py:166
+msgid "The reading has an unmatched parenthesis"
+msgstr "The reading has an unmatched parenthesis"
+
+#: userDictEditor.py:162
+msgid "The reading must not be empty"
+msgstr "The reading must not be empty"
+
+#: userDictEditor.py:156
+msgid "The reading must not contain a colon"
+msgstr "The reading must not contain a colon"
+
+#: userDictEditor.py:179
+msgid "The text contains a character that cannot be saved in the dictionary file"
+msgstr "The text contains a character that cannot be saved in the dictionary file"
+
+#: userDictEditor.py:153
+msgid "The text must not contain double quotes or line breaks"
+msgstr "The text must not contain double quotes or line breaks"
+
+#: userDictEditor.py:580
+msgid "There are unsaved changes. Close without saving?"
+msgstr "There are unsaved changes. Close without saving?"
+
+#: ppaWakeUpCore.py:578
 msgid "Unexpected error: {error}"
 msgstr "Unexpected error: {error}"
 
-#: ppaWakeUpCore.py:516
+#: userDictEditor.py:172
+msgid "Unknown marker ({marker}). Allowed words: half, short, long, samun, ake, tho, three, jutthawa, -d, -f, -k, -l, -s, -sh, -t, +s, +es, +ed"
+msgstr "Unknown marker ({marker}). Allowed words: half, short, long, samun, ake, tho, three, jutthawa, -d, -f, -k, -l, -s, -sh, -t, +s, +es, +ed"
+
+#: userDictEditor.py:582
+msgid "Unsaved changes"
+msgstr "Unsaved changes"
+
+#: ppaWakeUpCore.py:552
 msgid "Wake up"
 msgstr "Wake up"
 
-#: ppaWakeUpCore.py:477
-msgid "Wake up PPA Tatip (single tap), Open options (double tap), Open menu (triple tap)"
-msgstr "Wake up PPA Tatip (single tap), Open options (double tap), Open menu (triple tap)"
+#: ppaWakeUpCore.py:513
+msgid "Wake up PPA Tatip (single tap), Edit Tatip dictionary (double tap), Open menu (triple tap)"
+msgstr "Wake up PPA Tatip (single tap), Edit Tatip dictionary (double tap), Open menu (triple tap)"
+
+#: tatipDictionaryDriver.py:122
+msgid "Windows must use the Thai language for non-Unicode programs to send words to PPA Tatip"
+msgstr "Windows must use the Thai language for non-Unicode programs to send words to PPA Tatip"
+
+#: userDictEditor.py:375
+msgid "Word added. Press Apply to save"
+msgstr "Word added. Press Apply to save"
+
+#: userDictEditor.py:427
+msgid "Word removed. Press Apply to save"
+msgstr "Word removed. Press Apply to save"
+
+#: userDictEditor.py:398
+msgid "Word updated. Press Apply to save"
+msgstr "Word updated. Press Apply to save"
+
+#: tatipDictionaryDriver.py:157
+msgid "closing the options window"
+msgstr "closing the options window"
+
+#: tatipDictionaryDriver.py:153
+msgid "confirming a word"
+msgstr "confirming a word"
+
+#: userDictEditor.py:325
+msgid "line"
+msgstr "line"
+
+#: tatipDictionaryDriver.py:155
+msgid "saving the dictionary"
+msgstr "saving the dictionary"
+
+#: userDictEditor.py:360
+msgid "{count} results found"
+msgstr "{count} results found"

@@ -1,6 +1,4 @@
 # ppaWakeUpCore.py
-# Copyright (C) 2026 Chai Chaimee
-# Licensed under GNU General Public License. See COPYING.txt for details.
 
 import globalPluginHandler
 import addonHandler
@@ -18,8 +16,13 @@ import gui
 import shutil
 import json
 import controlTypes
-import speech.speech as speechModule
+import synthDriverHandler
+from speech.extensions import filter_speechSequence
 import globalVars
+
+from . import tatipDictionaryDriver
+from . import tatipWindowDump
+from . import userDictEditor
 
 
 # Unicode range of characters that may cause PPA Tatip to stop working
@@ -72,6 +75,7 @@ _DIALOG_ACTION_BUTTON_LABELS = {
 }
 
 _DIALOG_WATCHDOG_DELAY_MS = 1500
+_STARTUP_STATE_LOG_DELAY_MS = 3000
 _TATIP_PROCESS_NAME = "windows_tatip.exe"
 
 # Minimum time after a confirmed-successful launch before a new windows+p
@@ -86,29 +90,35 @@ _RESTART_COOLDOWN_SEC = 3.0
 # slower-to-register application.
 _LAUNCH_CONFIRM_TIMEOUT_SEC = 2.5
 
-# Used to force-release the Windows modifier key immediately after the
-# windows+p gesture fires. Windows can otherwise be left believing the
-# key is still physically held, which routes every subsequent "p" press
-# to the shell's Project switcher instead of the focused application.
+# Log evidence showed Windows' own shell repeatedly re-triggering its
+# native Win+P "Project" panel on later bare "p" presses, with NVDA's own
+# keyboard hook never seeing those presses at all - meaning Windows itself
+# still believed the Windows modifier was held down after our gesture
+# consumed the original windows+p combo, and kept routing plain "p" back
+# into the same system shortcut instead of the focused application.
+# Releasing only the Windows key was tried previously and was not
+# sufficient; releasing the "p" key as well matches the observed
+# mechanism more precisely.
 _VK_LWIN = 0x5B
 _VK_RWIN = 0x5C
+_VK_P = 0x50
 _KEYEVENTF_KEYUP = 0x0002
 
 
-def _forceReleaseWindowsModifier():
-    """Synthesize a key-up for both Windows keys via the raw Win32 API.
+def _forceReleaseStuckKeys():
+    """Synthesize a key-up for the Windows keys and the P key.
 
-    NVDA's low-level keyboard hook consumes the windows+p combination so
-    the shell never sees a matched chord, but the standalone key-down for
-    the Windows key can still reach the OS's own modifier tracking ahead
-    of that match. If the corresponding key-up is ever swallowed instead
-    of forwarded, Windows keeps treating the key as held, and the user
-    loses the ability to type the letter "p" until a reboot. Sending an
-    explicit synthetic key-up here clears that state unconditionally,
-    regardless of what the hook already did with the real event.
+    NVDA's low-level hook consumes the windows+p combination for gesture
+    matching, but Windows' own shell-level modifier tracking can be left
+    believing both keys are still physically held. Left uncorrected, a
+    later standalone "p" press is read by the shell as another windows+p
+    invocation, cycling its own Project panel instead of reaching the
+    focused application, and never even reaching NVDA's own keyboard
+    hook. This clears that state unconditionally after our gesture fires.
     """
     ctypes.windll.user32.keybd_event(_VK_LWIN, 0, _KEYEVENTF_KEYUP, 0)
     ctypes.windll.user32.keybd_event(_VK_RWIN, 0, _KEYEVENTF_KEYUP, 0)
+    ctypes.windll.user32.keybd_event(_VK_P, 0, _KEYEVENTF_KEYUP, 0)
 
 
 def _beep(pitch, durationMs):
@@ -120,6 +130,11 @@ def _beep(pitch, durationMs):
     the background worker threads used throughout this module.
     """
     wx.CallAfter(tones.beep, pitch, durationMs)
+
+
+def _postMessage(text):
+    """Speak a message from a background thread by marshaling it to the main thread."""
+    wx.CallAfter(ui.message, text)
 
 
 class TatipMenu(wx.Frame):
@@ -286,11 +301,32 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         self._restartLock = threading.Lock()
         self._lastSuccessfulStartTime = 0.0
         self._dialogWatchdogCall = None
+        self._dictionaryEditor = None
+        self._startupStateCall = core.callLater(_STARTUP_STATE_LOG_DELAY_MS, self._logStartupState)
 
         self._settings = self._loadSettings()
 
-        self._originalSpeak = speechModule.speak
-        speechModule.speak = self._filteredSpeak
+        filter_speechSequence.register(self._filterSpeechSequence)
+
+    def _logStartupState(self):
+        self._startupStateCall = None
+        synthName = "unknown"
+        voiceName = "unknown"
+        try:
+            currentSynth = synthDriverHandler.getSynth()
+            synthName = currentSynth.name
+            voiceId = currentSynth.voice
+            voiceName = currentSynth.availableVoices[voiceId].displayName
+        except (AttributeError, KeyError, TypeError, RuntimeError):
+            logHandler.log.debugWarning("PPAWakeUp: could not read the active voice", exc_info=True)
+
+        def worker():
+            isRunning = self._isProcessRunning(_TATIP_PROCESS_NAME)
+            logHandler.log.info(
+                f"PPAWakeUp: startup state synth={synthName!r} voice={voiceName!r} tatipRunning={isRunning}"
+            )
+
+        threading.Thread(target=worker, daemon=True).start()
 
     def _getSettingsPath(self):
         settingsDir = os.path.join(globalVars.appArgs.configPath, *_SETTINGS_SUBFOLDER.split(os.sep))
@@ -319,15 +355,14 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         except OSError as e:
             logHandler.log.error(f"Failed to save PPAWakeUp settings: {e}")
 
-    def _filteredSpeak(self, sequence, *args, **kwargs):
+    def _filterSpeechSequence(self, speechSequence):
         """Filter speech sequence to remove characters that crash PPA Tatip."""
         if not self._settings.get("skipCjkCharacters", True):
-            self._originalSpeak(sequence, *args, **kwargs)
-            return
+            return speechSequence
 
         try:
             filtered = []
-            for item in sequence:
+            for item in speechSequence:
                 if isinstance(item, str):
                     # Keep only characters that are not within the forbidden range
                     cleaned = ''.join(ch for ch in item if not self._isCharBlockedForTatip(ch))
@@ -336,23 +371,23 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                     filtered.append(item)
         except Exception as e:
             # A failure in filtering must never take NVDA's entire speech
-            # output down with it; fall back to speaking the sequence
-            # unfiltered rather than leaving the user with total silence.
+            # output down with it; fall back to the unfiltered sequence
+            # rather than leaving the user with total silence.
             logHandler.log.error(f"PPAWakeUp speech filter failed, speaking unfiltered: {e}")
-            self._originalSpeak(sequence, *args, **kwargs)
-            return
+            return speechSequence
 
         # If filtering stripped every character out of a plain-text-only
         # sequence, there is nothing left worth sending downstream. PPA
         # Tatip's own file-based synth protocol still receives an
         # empty-text payload in this case (confirmed against its own
         # sapi_input.txt), so sending it serves no purpose and only risks
-        # feeding Tatip a degenerate request.
+        # feeding Tatip a degenerate request. An empty sequence is dropped
+        # by NVDA before it reaches the synthesizer.
         if filtered and all(isinstance(item, str) for item in filtered):
             if not ''.join(filtered).strip():
-                return
+                return []
 
-        self._originalSpeak(filtered, *args, **kwargs)
+        return filtered
 
     @staticmethod
     def _isCharBlockedForTatip(ch):
@@ -364,31 +399,32 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         return False
 
     def terminate(self):
-        if speechModule.speak is self._filteredSpeak:
-            speechModule.speak = self._originalSpeak
-        else:
-            # Another add-on has patched speech.speak on top of ours since
-            # load. Forcibly restoring here would silently erase that
-            # add-on's active patch instead of unwinding cleanly, which is
-            # a known cause of NVDA speech going completely silent after a
-            # plugin reload. Leave it in place; whichever add-on patched
-            # last is responsible for restoring the layer beneath it.
-            logHandler.log.debug(
-                "PPAWakeUp: speech.speak was patched by another add-on after ours; leaving it in place"
-            )
+        filter_speechSequence.unregister(self._filterSpeechSequence)
+        if self._dictionaryEditor:
+            try:
+                self._dictionaryEditor.forceClose()
+            except RuntimeError:
+                logHandler.log.debugWarning("PPAWakeUp: dictionary editor was already destroyed", exc_info=True)
+            self._dictionaryEditor = None
         if self._pendingCall:
             self._pendingCall.Stop()
             self._pendingCall = None
         if self._dialogWatchdogCall:
             self._dialogWatchdogCall.Stop()
             self._dialogWatchdogCall = None
+        if self._startupStateCall:
+            self._startupStateCall.Stop()
+            self._startupStateCall = None
         super().terminate()
 
     def _findTatipPath(self):
         primary = os.path.expandvars(r"%LocalAppData%\Programs\PPA Tatip\interface\windows_tatip.exe")
         if os.path.exists(primary):
             return primary
-        for base in [r"C:\Program Files", r"C:\Program Files (x86)"]:
+        for programFilesVar in ("ProgramFiles", "ProgramFiles(x86)"):
+            base = os.environ.get(programFilesVar)
+            if not base:
+                continue
             candidate = os.path.join(base, "PPA Tatip", "interface", "windows_tatip.exe")
             if os.path.exists(candidate):
                 return candidate
@@ -457,7 +493,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         return self._pollUntil(lambda: not self._isProcessRunning(processName), timeoutSec=0.6, intervalSec=0.1)
 
     def script_windows_p_tap(self, gesture):
-        _forceReleaseWindowsModifier()
+        _forceReleaseStuckKeys()
 
         now = time.time()
         if now - self._lastTapTime > self._tapThreshold:
@@ -474,7 +510,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
             self._executeTapAction
         )
 
-    script_windows_p_tap.__doc__ = _("Wake up PPA Tatip (single tap), Open options (double tap), Open menu (triple tap)")
+    script_windows_p_tap.__doc__ = _("Wake up PPA Tatip (single tap), Edit Tatip dictionary (double tap), Open menu (triple tap)")
     script_windows_p_tap.category = scriptCategory
 
     def _executeTapAction(self):
@@ -482,18 +518,18 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         if self._tapCount == 1:
             self._startTatip()
         elif self._tapCount == 2:
-            self._openTatipOption()
+            self._showDictionaryEditor()
         elif self._tapCount >= 3:
             self._showMenuFrame()
         self._tapCount = 0
 
-    def _startTatip(self):
+    def _startTatip(self, force=False):
         # Repeated windows+p presses within a few seconds of a launch that
         # already confirmed running were observed force-killing a Tatip
         # process that had only just finished starting, producing a
         # self-defeating retry spiral instead of a recovery. If the last
         # launch succeeded very recently, skip the kill/relaunch entirely.
-        if time.time() - self._lastSuccessfulStartTime < _RESTART_COOLDOWN_SEC:
+        if not force and time.time() - self._lastSuccessfulStartTime < _RESTART_COOLDOWN_SEC:
             ui.message(_("PPA Tatip is already awake"))
             _beep(200, 100)
             return
@@ -508,12 +544,12 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                 try:
                     tatipPath = self._findTatipPath()
                     if not tatipPath:
-                        ui.message(_("Error: windows_tatip.exe not found. Please ensure PPA Tatip is installed."))
+                        _postMessage(_("Error: windows_tatip.exe not found. Please ensure PPA Tatip is installed."))
                         _beep(500, 500)
                         logHandler.log.error("windows_tatip.exe not found")
                         return
 
-                    ui.message(_("Wake up"))
+                    _postMessage(_("Wake up"))
                     _beep(100, 100)
 
                     killed = self._forceKillTatip()
@@ -536,10 +572,10 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                         logHandler.log.warning(f"PPA Tatip launch attempt {attempt} did not confirm running, retrying")
 
                     if not launched:
-                        ui.message(_("PPA Tatip did not confirm startup. Please try Windows+P again."))
+                        _postMessage(_("PPA Tatip did not confirm startup. Please try Windows+P again."))
                         _beep(400, 300)
                 except Exception as e:
-                    ui.message(_("Unexpected error: {error}").format(error=str(e)))
+                    _postMessage(_("Unexpected error: {error}").format(error=str(e)))
                     _beep(500, 500)
                     logHandler.log.error("startTatip error: %s", str(e))
                 finally:
@@ -556,14 +592,14 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
             try:
                 optionPath = os.path.expandvars(r"%USERPROFILE%\AppData\Local\Programs\PPA Tatip\interface\openoption.exe")
                 if not os.path.exists(optionPath):
-                    ui.message(_("Error: openoption.exe not found. Please ensure PPA Tatip is installed."))
+                    _postMessage(_("Error: openoption.exe not found. Please ensure PPA Tatip is installed."))
                     _beep(500, 500)
                     logHandler.log.error("openoption.exe not found")
                     return
-                ui.message(_("Option"))
+                _postMessage(_("Option"))
                 subprocess.Popen([optionPath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             except Exception as e:
-                ui.message(_("Error: Failed to open PPA Tatip options - {error}").format(error=str(e)))
+                _postMessage(_("Error: Failed to open PPA Tatip options - {error}").format(error=str(e)))
                 _beep(500, 500)
                 logHandler.log.error("openTatipOption error: %s", str(e))
 
@@ -572,10 +608,12 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
     def _showMenuFrame(self):
         """Open the Tatip management menu as a small window."""
         callbackMap = {
+            _("Open Tatip options"): self._openTatipOption,
             _("Tatip reader setting"): self._showSettingsDialog,
             _("Backup Tatip dictionary"): self._backupDictionary,
             _("Restore Tatip dictionary"): self._restoreDictionary,
             _("Open Tatip folder"): self._openTatipFolder,
+            _("Diagnostics: dump Tatip windows"): self._dumpTatipWindows,
         }
         try:
             showTatipMenu(gui.mainFrame, callbackMap, title=_("PPA Tatip \u2013 Menu"))
@@ -589,6 +627,100 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         except Exception as e:
             logHandler.log.error("Failed to open Tatip settings dialog: %s", str(e))
 
+    def _dumpTatipWindows(self):
+        """Record the window tree of PPA Tatip (read-only) to a file and to the NVDA log."""
+        def worker():
+            try:
+                outputPath = os.path.join(self._getBackupDir(), "tatip_window_dump.txt")
+                dumpText, windowCount = tatipWindowDump.dumpTatipWindows(outputPath)
+                logHandler.log.info(f"PPAWakeUp: Tatip window dump written to {outputPath}\n{dumpText}")
+                if not windowCount:
+                    _postMessage(_("Error: no PPA Tatip window was found. Open the Tatip dictionary window first."))
+                    _beep(500, 500)
+                    return
+                _beep(1500, 100)
+                _postMessage(_("Tatip window dump saved"))
+            except (OSError, ctypes.ArgumentError) as e:
+                _postMessage(_("Error: Failed to dump Tatip windows - {error}").format(error=str(e)))
+                _beep(500, 500)
+                logHandler.log.error(f"PPAWakeUp: Tatip window dump failed: {e}", exc_info=True)
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def _showDictionaryEditor(self):
+        """Open the Tatip dictionary editor window."""
+        if self._dictionaryEditor:
+            try:
+                self._dictionaryEditor.Raise()
+                return
+            except RuntimeError:
+                self._dictionaryEditor = None
+        dictPath = userDictEditor.findUserDictPath()
+        if not dictPath:
+            ui.message(_("Error: userdict.txt not found. Please ensure PPA Tatip is installed."))
+            _beep(500, 500)
+            logHandler.log.error("userdict.txt not found")
+            return
+        try:
+            self._dictionaryEditor = userDictEditor.showUserDictEditor(
+                gui.mainFrame,
+                dictPath,
+                self._getBackupDir(),
+                self._onDictionaryApplied,
+                self._onDictionaryEditorClosed,
+                self._sendWordsToTatip,
+            )
+        except (OSError, UnicodeDecodeError) as e:
+            ui.message(_("Error: Failed to open the dictionary - {error}").format(error=str(e)))
+            _beep(500, 500)
+            logHandler.log.error("Failed to open Tatip dictionary editor: %s", str(e))
+
+    def _onDictionaryApplied(self):
+        # The restart below ends the process on purpose; without this the
+        # dialog watchdog would report it as a crash and restart it again.
+        if self._dialogWatchdogCall:
+            self._dialogWatchdogCall.Stop()
+            self._dialogWatchdogCall = None
+        # force skips the "already awake" cooldown: the new words only take
+        # effect after Tatip is restarted, however recently it was started.
+        wx.CallAfter(self._startTatip, True)
+
+    def _launchOptionsForDriver(self):
+        """Start openoption.exe and return; raises DriverError or OSError."""
+        optionPath = os.path.expandvars(r"%USERPROFILE%\AppData\Local\Programs\PPA Tatip\interface\openoption.exe")
+        if not os.path.exists(optionPath):
+            raise tatipDictionaryDriver.DriverError(
+                _("Error: openoption.exe not found. Please ensure PPA Tatip is installed.")
+            )
+        subprocess.Popen([optionPath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    def _sendWordsToTatip(self, words, onDone):
+        """Let PPA Tatip add the words so that it generates their pronunciation code."""
+        def worker():
+            succeeded = False
+            message = ""
+            try:
+                tatipDictionaryDriver.addWords(words, self._launchOptionsForDriver)
+                succeeded = True
+            except tatipDictionaryDriver.DriverError as e:
+                message = str(e)
+            except OSError as e:
+                message = str(e)
+                logHandler.log.error(f"PPAWakeUp: hand-over to PPA Tatip failed: {e}", exc_info=True)
+            if not succeeded:
+                try:
+                    dumpPath = os.path.join(self._getBackupDir(), "tatip_window_dump.txt")
+                    dumpText, _windowCount = tatipWindowDump.dumpTatipWindows(dumpPath)
+                    logHandler.log.info(f"PPAWakeUp: Tatip windows after a failed hand-over\n{dumpText}")
+                except OSError:
+                    logHandler.log.debugWarning("PPAWakeUp: could not record Tatip windows", exc_info=True)
+            wx.CallAfter(onDone, succeeded, message)
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def _onDictionaryEditorClosed(self):
+        self._dictionaryEditor = None
+
     def _getBackupDir(self):
         backupDir = os.path.join(globalVars.appArgs.configPath, "ChaiChaimee", "PPAWakeUp")
         os.makedirs(backupDir, exist_ok=True)
@@ -599,7 +731,7 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
             try:
                 source = os.path.expandvars(r"%USERPROFILE%\AppData\Local\Programs\PPA Tatip\interface\userdict.txt")
                 if not os.path.exists(source):
-                    ui.message(_("Error: userdict.txt not found at source location."))
+                    _postMessage(_("Error: userdict.txt not found at source location."))
                     _beep(500, 500)
                     return
 
@@ -607,13 +739,13 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                 dest = os.path.join(destDir, "userdict.txt")
                 shutil.copy2(source, dest)
                 if os.path.exists(dest):
-                    ui.message(_("Backup completed: {dest}").format(dest=dest))
+                    _postMessage(_("Backup completed: {dest}").format(dest=dest))
                     _beep(800, 200)
                 else:
-                    ui.message(_("Backup failed: file not written to {dest}").format(dest=dest))
+                    _postMessage(_("Backup failed: file not written to {dest}").format(dest=dest))
                     _beep(500, 500)
             except Exception as e:
-                ui.message(_("Backup failed: {error}").format(error=str(e)))
+                _postMessage(_("Backup failed: {error}").format(error=str(e)))
                 _beep(500, 500)
                 logHandler.log.error("Backup error: %s", str(e))
 
@@ -624,18 +756,18 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
             try:
                 source = os.path.join(self._getBackupDir(), "userdict.txt")
                 if not os.path.exists(source):
-                    ui.message(_("Error: No backup file found. Please perform a backup first."))
+                    _postMessage(_("Error: No backup file found. Please perform a backup first."))
                     _beep(500, 500)
                     return
 
                 target = os.path.expandvars(r"%USERPROFILE%\AppData\Local\Programs\PPA Tatip\interface\userdict.txt")
                 shutil.copy2(source, target)
-                ui.message(_("Dictionary restored. Reloading PPA Tatip..."))
+                _postMessage(_("Dictionary restored. Reloading PPA Tatip..."))
                 _beep(800, 200)
 
-                self._startTatip()
+                wx.CallAfter(self._startTatip)
             except Exception as e:
-                ui.message(_("Restore failed: {error}").format(error=str(e)))
+                _postMessage(_("Restore failed: {error}").format(error=str(e)))
                 _beep(500, 500)
                 logHandler.log.error("Restore error: %s", str(e))
 
@@ -646,13 +778,13 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
             try:
                 folderPath = os.path.expandvars(r"%USERPROFILE%\AppData\Local\Programs\PPA Tatip\interface")
                 if not os.path.isdir(folderPath):
-                    ui.message(_("Error: Tatip folder not found."))
+                    _postMessage(_("Error: Tatip folder not found."))
                     _beep(500, 500)
                     return
                 os.startfile(folderPath)
-                ui.message(_("Tatip folder opened"))
+                _postMessage(_("Tatip folder opened"))
             except Exception as e:
-                ui.message(_("Failed to open folder: {error}").format(error=str(e)))
+                _postMessage(_("Failed to open folder: {error}").format(error=str(e)))
                 _beep(500, 500)
                 logHandler.log.error("OpenTatipFolder error: %s", str(e))
 
@@ -682,9 +814,11 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         self._dialogWatchdogCall = None
 
         def worker():
+            if self._restartInProgress:
+                return
             if not self._isProcessRunning(_TATIP_PROCESS_NAME):
                 logHandler.log.warning("PPA Tatip crash detected after dialog button focus, restarting")
-                self._startTatip()
+                wx.CallAfter(self._startTatip)
 
         threading.Thread(target=worker, daemon=True).start()
 

@@ -9,6 +9,7 @@ import ctypes
 import tones
 import time
 import threading
+import config
 import core
 import logHandler
 import wx
@@ -19,8 +20,10 @@ import controlTypes
 import synthDriverHandler
 from speech.extensions import filter_speechSequence
 import globalVars
+import NVDAState
 
 from . import tatipDictionaryDriver
+from . import tatipVoiceSettings
 from . import tatipWindowDump
 from . import userDictEditor
 
@@ -58,6 +61,7 @@ _DEFAULT_SETTINGS = {
     "skipCjkCharacters": True,
     "protectDialogButtonCrash": True,
     "autoRetryWakeUp": True,
+    "wakeOnStartup": True,
 }
 
 # Labels of dialog action buttons (Open/OK/Save/Yes) known to trigger a silent
@@ -77,6 +81,8 @@ _DIALOG_ACTION_BUTTON_LABELS = {
 _DIALOG_WATCHDOG_DELAY_MS = 1500
 _STARTUP_STATE_LOG_DELAY_MS = 3000
 _TATIP_PROCESS_NAME = "windows_tatip.exe"
+_VOICE_AUTO_BACKUP_DELAY_MS = 5000
+_NVDA_RESTART_DELAY_MS = 1500
 
 # Minimum time after a confirmed-successful launch before a new windows+p
 # press is allowed to force-kill and relaunch Tatip again. Without this,
@@ -135,6 +141,11 @@ def _beep(pitch, durationMs):
 def _postMessage(text):
     """Speak a message from a background thread by marshaling it to the main thread."""
     wx.CallAfter(ui.message, text)
+
+
+def _canWriteConfiguration():
+    shouldWrite = getattr(NVDAState, "shouldWriteToDisk", None)
+    return shouldWrite() if callable(shouldWrite) else True
 
 
 class TatipMenu(wx.Frame):
@@ -244,6 +255,14 @@ class TatipSettingsDialog(wx.Dialog):
         )
         self._autoRetryCheckbox.SetValue(currentSettings.get("autoRetryWakeUp", True))
 
+        self._wakeOnStartupCheckbox = helper.addItem(
+            wx.CheckBox(
+                panel,
+                label=_("Wake up PPA Tatip automatically when NVDA starts with the Tatip voice")
+            )
+        )
+        self._wakeOnStartupCheckbox.SetValue(currentSettings.get("wakeOnStartup", True))
+
         buttonSizer = wx.StdDialogButtonSizer()
         okButton = wx.Button(panel, wx.ID_OK)
         okButton.SetDefault()
@@ -269,6 +288,7 @@ class TatipSettingsDialog(wx.Dialog):
             "skipCjkCharacters": self._skipCjkCheckbox.GetValue(),
             "protectDialogButtonCrash": self._protectDialogCheckbox.GetValue(),
             "autoRetryWakeUp": self._autoRetryCheckbox.GetValue(),
+            "wakeOnStartup": self._wakeOnStartupCheckbox.GetValue(),
         }
         if self._onSave:
             self._onSave(updatedSettings)
@@ -302,7 +322,9 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         self._lastSuccessfulStartTime = 0.0
         self._dialogWatchdogCall = None
         self._dictionaryEditor = None
+        self._voiceRestartCall = None
         self._startupStateCall = core.callLater(_STARTUP_STATE_LOG_DELAY_MS, self._logStartupState)
+        self._voiceAutoBackupCall = core.callLater(_VOICE_AUTO_BACKUP_DELAY_MS, self._autoBackupVoiceSettings)
 
         self._settings = self._loadSettings()
 
@@ -312,10 +334,12 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         self._startupStateCall = None
         synthName = "unknown"
         voiceName = "unknown"
+        isTatipVoice = False
         try:
             currentSynth = synthDriverHandler.getSynth()
             synthName = currentSynth.name
             voiceId = currentSynth.voice
+            isTatipVoice = "tatip" in str(voiceId).lower()
             voiceName = currentSynth.availableVoices[voiceId].displayName
         except (AttributeError, KeyError, TypeError, RuntimeError):
             logHandler.log.debugWarning("PPAWakeUp: could not read the active voice", exc_info=True)
@@ -325,6 +349,9 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
             logHandler.log.info(
                 f"PPAWakeUp: startup state synth={synthName!r} voice={voiceName!r} tatipRunning={isRunning}"
             )
+            if isTatipVoice and not isRunning and self._settings.get("wakeOnStartup", True):
+                logHandler.log.info("PPAWakeUp: the Tatip voice is active but Tatip is not running, waking it up silently")
+                wx.CallAfter(self._startTatip, False, True)
 
         threading.Thread(target=worker, daemon=True).start()
 
@@ -415,6 +442,12 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
         if self._startupStateCall:
             self._startupStateCall.Stop()
             self._startupStateCall = None
+        if self._voiceAutoBackupCall:
+            self._voiceAutoBackupCall.Stop()
+            self._voiceAutoBackupCall = None
+        if self._voiceRestartCall:
+            self._voiceRestartCall.Stop()
+            self._voiceRestartCall = None
         super().terminate()
 
     def _findTatipPath(self):
@@ -523,20 +556,23 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
             self._showMenuFrame()
         self._tapCount = 0
 
-    def _startTatip(self, force=False):
+    def _startTatip(self, force=False, silent=False):
+        """Wake up PPA Tatip; with silent=True nothing is spoken or beeped and outcomes only go to the log."""
         # Repeated windows+p presses within a few seconds of a launch that
         # already confirmed running were observed force-killing a Tatip
         # process that had only just finished starting, producing a
         # self-defeating retry spiral instead of a recovery. If the last
         # launch succeeded very recently, skip the kill/relaunch entirely.
         if not force and time.time() - self._lastSuccessfulStartTime < _RESTART_COOLDOWN_SEC:
-            ui.message(_("PPA Tatip is already awake"))
-            _beep(200, 100)
+            if not silent:
+                ui.message(_("PPA Tatip is already awake"))
+                _beep(200, 100)
             return
 
         with self._restartLock:
             if self._restartInProgress:
-                ui.message(_("Already trying to wake up PPA Tatip, please wait"))
+                if not silent:
+                    ui.message(_("Already trying to wake up PPA Tatip, please wait"))
                 return
             self._restartInProgress = True
         try:
@@ -544,13 +580,15 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                 try:
                     tatipPath = self._findTatipPath()
                     if not tatipPath:
-                        _postMessage(_("Error: windows_tatip.exe not found. Please ensure PPA Tatip is installed."))
-                        _beep(500, 500)
+                        if not silent:
+                            _postMessage(_("Error: windows_tatip.exe not found. Please ensure PPA Tatip is installed."))
+                            _beep(500, 500)
                         logHandler.log.error("windows_tatip.exe not found")
                         return
 
-                    _postMessage(_("Wake up"))
-                    _beep(100, 100)
+                    if not silent:
+                        _postMessage(_("Wake up"))
+                        _beep(100, 100)
 
                     killed = self._forceKillTatip()
                     if not killed:
@@ -572,11 +610,14 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                         logHandler.log.warning(f"PPA Tatip launch attempt {attempt} did not confirm running, retrying")
 
                     if not launched:
-                        _postMessage(_("PPA Tatip did not confirm startup. Please try Windows+P again."))
-                        _beep(400, 300)
+                        if not silent:
+                            _postMessage(_("PPA Tatip did not confirm startup. Please try Windows+P again."))
+                            _beep(400, 300)
+                        logHandler.log.warning("PPA Tatip did not confirm startup")
                 except Exception as e:
-                    _postMessage(_("Unexpected error: {error}").format(error=str(e)))
-                    _beep(500, 500)
+                    if not silent:
+                        _postMessage(_("Unexpected error: {error}").format(error=str(e)))
+                        _beep(500, 500)
                     logHandler.log.error("startTatip error: %s", str(e))
                 finally:
                     with self._restartLock:
@@ -608,11 +649,15 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
     def _showMenuFrame(self):
         """Open the Tatip management menu as a small window."""
         callbackMap = {
-            _("Open Tatip options"): self._openTatipOption,
             _("Tatip reader setting"): self._showSettingsDialog,
+            _("PPA Tatip Dictionary Editor"): self._showDictionaryEditor,
             _("Backup Tatip dictionary"): self._backupDictionary,
             _("Restore Tatip dictionary"): self._restoreDictionary,
+            _("Backup Tatip Voice option Setting"): self._backupVoiceSettings,
+            _("Restore Tatip Voice option Setting"): self._restoreVoiceSettings,
+            _("standard default tatip voice settings"): self._restoreDefaultVoiceSettings,
             _("Open Tatip folder"): self._openTatipFolder,
+            _("Open Tatip options"): self._openTatipOption,
             _("Diagnostics: dump Tatip windows"): self._dumpTatipWindows,
         }
         try:
@@ -772,6 +817,122 @@ class GlobalPlugin(globalPluginHandler.GlobalPlugin):
                 logHandler.log.error("Restore error: %s", str(e))
 
         threading.Thread(target=worker, daemon=True).start()
+
+    def _autoBackupVoiceSettings(self):
+        self._voiceAutoBackupCall = None
+
+        def worker():
+            try:
+                backupPath = tatipVoiceSettings.getBackupPath(self._getBackupDir())
+                if os.path.exists(backupPath):
+                    return
+                defaultSections = tatipVoiceSettings.getDefaultVoiceSettings()
+                tatipVoiceSettings.writeBackupFile(backupPath, defaultSections)
+                logHandler.log.info(
+                    f"PPAWakeUp: default voice option settings file created ({', '.join(defaultSections)}) at {backupPath}"
+                )
+            except OSError as e:
+                logHandler.log.error(f"PPAWakeUp: creating the default voice option settings file failed: {e}", exc_info=True)
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def _backupVoiceSettings(self):
+        try:
+            sections = tatipVoiceSettings.captureVoiceSettings()
+        except (AttributeError, KeyError, TypeError) as e:
+            ui.message(_("Backup failed: {error}").format(error=str(e)))
+            _beep(500, 500)
+            logHandler.log.error(f"PPAWakeUp: could not read the voice option settings: {e}", exc_info=True)
+            return
+        if not sections:
+            ui.message(_("Error: No Tatip voice option setting was found in the NVDA configuration."))
+            _beep(500, 500)
+            return
+
+        def worker():
+            try:
+                backupPath = tatipVoiceSettings.getBackupPath(self._getBackupDir())
+                tatipVoiceSettings.writeBackupFile(backupPath, sections)
+            except OSError as e:
+                _postMessage(_("Backup failed: {error}").format(error=str(e)))
+                _beep(500, 500)
+                logHandler.log.error(f"PPAWakeUp: voice option backup failed: {e}", exc_info=True)
+                return
+            logHandler.log.info(f"PPAWakeUp: voice option settings backed up ({', '.join(sections)}) to {backupPath}")
+            _postMessage(_("Backup completed: {dest}").format(dest=backupPath))
+            _beep(800, 200)
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def _restoreVoiceSettings(self):
+        def worker():
+            try:
+                backupPath = tatipVoiceSettings.getBackupPath(self._getBackupDir())
+                if not os.path.exists(backupPath):
+                    _postMessage(_("Error: No backup file found. Please perform a backup first."))
+                    _beep(500, 500)
+                    return
+                sections = tatipVoiceSettings.readBackupFile(backupPath)
+            except (OSError, tatipVoiceSettings.VoiceSettingsError) as e:
+                _postMessage(_("Restore failed: {error}").format(error=str(e)))
+                _beep(500, 500)
+                logHandler.log.error(f"PPAWakeUp: voice option restore failed: {e}", exc_info=True)
+                return
+            wx.CallAfter(self._applyRestoredVoiceSettings, sections)
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def _restoreDefaultVoiceSettings(self):
+        self._applyRestoredVoiceSettings(tatipVoiceSettings.getDefaultVoiceSettings())
+
+    def _applyRestoredVoiceSettings(self, sections):
+        if self._voiceRestartCall:
+            return
+        if not _canWriteConfiguration():
+            ui.message(_("Restore failed: NVDA cannot save its configuration right now."))
+            _beep(500, 500)
+            return
+        detachedSaveHandler = None
+        try:
+            restoredNames = tatipVoiceSettings.applyVoiceSettings(sections)
+            detachedSaveHandler = self._detachActiveSynthSaveAction(restoredNames)
+            config.conf.save()
+        except (OSError, ValueError, TypeError, KeyError) as e:
+            if detachedSaveHandler:
+                config.pre_configSave.register(detachedSaveHandler)
+            ui.message(_("Restore failed: {error}").format(error=str(e)))
+            _beep(500, 500)
+            logHandler.log.error(f"PPAWakeUp: voice option restore failed: {e}", exc_info=True)
+            return
+        logHandler.log.info(f"PPAWakeUp: voice option settings restored ({', '.join(restoredNames)}), restarting NVDA")
+        ui.message(_("Tatip voice option setting restored. Restarting NVDA..."))
+        _beep(800, 200)
+        self._voiceRestartCall = core.callLater(_NVDA_RESTART_DELAY_MS, self._restartNvda)
+
+    def _detachActiveSynthSaveAction(self, restoredNames):
+        """Stop the running synthesizer from writing its live settings over the restored ones.
+
+        NVDA notifies config.pre_configSave on every save, including the save
+        on exit, and the active synthesizer answers by writing its current
+        in-memory settings into its config section. Left registered, it would
+        overwrite the restored values before nvda.ini is written. NVDA is
+        restarted right after, so the handler does not need to come back.
+        """
+        try:
+            activeSynth = synthDriverHandler.getSynth()
+            if activeSynth is None or activeSynth.name not in restoredNames:
+                return None
+            saveHandler = activeSynth.saveSettings
+            config.pre_configSave.unregister(saveHandler)
+        except (AttributeError, KeyError, ValueError, TypeError):
+            logHandler.log.debugWarning("PPAWakeUp: could not detach the active synthesizer save action", exc_info=True)
+            return None
+        logHandler.log.info(f"PPAWakeUp: detached the save action of the active synthesizer {activeSynth.name!r}")
+        return saveHandler
+
+    def _restartNvda(self):
+        self._voiceRestartCall = None
+        core.restart()
 
     def _openTatipFolder(self):
         def worker():

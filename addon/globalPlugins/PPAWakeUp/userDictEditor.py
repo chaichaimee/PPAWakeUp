@@ -32,6 +32,24 @@ _ALLOWED_MARKERS = frozenset((
 _DEFAULT_TAIL_FIELDS = ("", "", "1", "", "", "")
 _DEFAULT_ENCODING = "cp874"
 _SEARCH_ANNOUNCE_DELAY_MS = 700
+_THAI_LEADING_VOWELS = "\u0e40\u0e41\u0e42\u0e43\u0e44"
+_THAI_FIRST_CONSONANT = "\u0e01"
+_THAI_LAST_CONSONANT = "\u0e2e"
+
+
+def _getSortKey(entry):
+    """Order a-z first, then the Thai alphabet; anything else goes last.
+
+    Thai words are filed by their first consonant, so the leading vowels
+    (the vowels written before the consonant) are skipped for the main key.
+    """
+    word = entry.pattern.strip()
+    firstChar = word[:1]
+    if "a" <= firstChar.lower() <= "z":
+        return (0, word.casefold(), word)
+    if _THAI_FIRST_CONSONANT <= firstChar <= _THAI_LAST_CONSONANT or firstChar in _THAI_LEADING_VOWELS:
+        return (1, word.lstrip(_THAI_LEADING_VOWELS) or word, word)
+    return (2, word.casefold(), word)
 
 
 def findUserDictPath():
@@ -200,7 +218,7 @@ class EntryEditDialog(wx.Dialog):
         self._patternEdit = sizerHelper.addLabeledControl(_("&Pattern:"), wx.TextCtrl)
         # Translators: Label of the reading field; the markers set half-tone, short and long vowels.
         self._readingEdit = sizerHelper.addLabeledControl(
-            _("&Replacement (reading, markers in parentheses such as (half), (short), (long)):"), wx.TextCtrl
+            _("&Replacement:"), wx.TextCtrl
         )
         self._patternEdit.SetValue(entry.pattern)
         self._readingEdit.SetValue(entry.reading)
@@ -250,15 +268,20 @@ class UserDictEditorDialog(wx.Dialog):
         self._pendingWords = []
         self._movedEntryKey = None
         self._searchAnnounceCall = None
+        self._initialFocusPending = True
 
+        # Controls are created in tab order: sort, move to line, search, word list, then the buttons.
         sizerHelper = gui.guiHelper.BoxSizerHelper(self, orientation=wx.VERTICAL)
+        # Translators: Button that sorts the dictionary words a-z, then in the Thai alphabet.
+        self._sortButton = wx.Button(self, label=_("Sort a-z"))
+        sizerHelper.addItem(self._sortButton)
+        # Translators: Label of the field holding the line the selected word is moved to when Apply or OK is pressed.
+        self._moveEdit = sizerHelper.addLabeledControl(_("&Move to line:"), wx.TextCtrl)
         # Translators: Label of the search box of the Tatip dictionary editor.
         self._searchEdit = sizerHelper.addLabeledControl(_("&Search:"), wx.TextCtrl)
         self._searchEdit.Bind(wx.EVT_TEXT, self._onSearchChanged)
         # Translators: Label of the word list of the Tatip dictionary editor.
         self._listBox = sizerHelper.addLabeledControl(_("Dictionary &words"), wx.ListBox, style=wx.LB_SINGLE)
-        # Translators: Label of the field holding the line the selected word is moved to when Apply or OK is pressed.
-        self._moveEdit = sizerHelper.addLabeledControl(_("&Move to line:"), wx.TextCtrl)
 
         actionRow = wx.BoxSizer(wx.HORIZONTAL)
         # Translators: Buttons of the Tatip dictionary editor.
@@ -283,6 +306,7 @@ class UserDictEditorDialog(wx.Dialog):
         self.SetSizerAndFit(sizerHelper.sizer)
         self.CentreOnScreen()
 
+        self._sortButton.Bind(wx.EVT_BUTTON, self._onSort)
         self._addButton.Bind(wx.EVT_BUTTON, self._onAdd)
         self._editButton.Bind(wx.EVT_BUTTON, self._onEdit)
         self._removeButton.Bind(wx.EVT_BUTTON, self._onRemove)
@@ -291,6 +315,7 @@ class UserDictEditorDialog(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self._onCancel, id=wx.ID_CANCEL)
         self.Bind(wx.EVT_CLOSE, self._onCloseEvent)
         self.Bind(wx.EVT_CHAR_HOOK, self._onCharHook)
+        self.Bind(wx.EVT_ACTIVATE, self._onActivate)
 
         self._refreshList()
         if self._listBox.GetCount():
@@ -298,7 +323,18 @@ class UserDictEditorDialog(wx.Dialog):
                 f"PPAWakeUp dictionary editor opened: {len(self._entries)} lines, "
                 f"first list item {self._listBox.GetString(0)!r}"
             )
-        wx.CallAfter(self._listBox.SetFocus)
+        self._listBox.SetFocus()
+        wx.CallAfter(self.focusWordList)
+
+    def focusWordList(self):
+        if not self._isClosed:
+            self._listBox.SetFocus()
+
+    def _onActivate(self, evt):
+        evt.Skip()
+        if evt.GetActive() and self._initialFocusPending:
+            self._initialFocusPending = False
+            wx.CallAfter(self.focusWordList)
 
     def _onCharHook(self, evt):
         keyCode = evt.GetKeyCode()
@@ -340,7 +376,8 @@ class UserDictEditorDialog(wx.Dialog):
     def _setBusy(self, isBusy):
         self._isBusy = isBusy
         for busyControl in (
-            self._addButton, self._editButton, self._removeButton, self._applyButton, self._okButton
+            self._sortButton, self._addButton, self._editButton, self._removeButton, self._applyButton,
+            self._okButton
         ):
             busyControl.Enable(not isBusy)
 
@@ -358,6 +395,28 @@ class UserDictEditorDialog(wx.Dialog):
         self._searchAnnounceCall = None
         # Translators: {count} is the number of dictionary words matching the search.
         ui.message(_("{count} results found").format(count=len(self._visibleIndices)))
+
+    def _onSort(self, evt):
+        if self._isBusy:
+            self._reportBusy()
+            return
+        selectedIndex = self._getSelectedEntryIndex()
+        selectedEntry = self._entries[selectedIndex] if selectedIndex is not None else None
+        # Lines that could not be parsed keep their place; only the editable words are reordered.
+        editableSlots = [entryIndex for entryIndex, entry in enumerate(self._entries) if entry.isEditable]
+        sortedEntries = sorted((self._entries[entryIndex] for entryIndex in editableSlots), key=_getSortKey)
+        if all(self._entries[entryIndex] is sortedEntry for entryIndex, sortedEntry in zip(editableSlots, sortedEntries)):
+            # Translators: Reported when Sort a-z is pressed and the words are already in order.
+            ui.message(_("The words are already sorted"))
+            return
+        for entryIndex, sortedEntry in zip(editableSlots, sortedEntries):
+            self._entries[entryIndex] = sortedEntry
+        self._isDirty = True
+        self._searchEdit.ChangeValue("")
+        newIndex = self._entries.index(selectedEntry) if selectedEntry is not None else None
+        self._refreshList(selectEntryIndex=newIndex)
+        # Translators: Reported after the words are sorted; the Thai alphabet follows a-z.
+        ui.message(_("Sorted a-z, then Thai. Press Apply to save"))
 
     def _onAdd(self, evt):
         if self._isBusy:
@@ -614,4 +673,5 @@ def showUserDictEditor(parent, filePath, backupDir, onApplied, onClosed, sendToT
     gui.mainFrame.prePopup()
     editorDialog.Show()
     editorDialog.Raise()
+    editorDialog.focusWordList()
     return editorDialog

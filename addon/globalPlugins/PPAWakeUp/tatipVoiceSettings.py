@@ -22,6 +22,18 @@ import config
 addonHandler.initTranslation()
 
 VOICE_SECTION_NAMES = ("sapi5", "ibmeci", "espeak")
+# Pseudo section that carries the voice settings panel options NVDA keeps
+# directly in the speech section (not per synthesizer), such as the
+# punctuation and symbol level.
+GENERAL_SECTION_NAME = "general"
+_GENERAL_SPEECH_KEYS = {
+    "symbolLevel": int,
+    "unicodeNormalization": str,
+    "autoLanguageSwitching": bool,
+    "autoDialectSwitching": bool,
+    "reportLanguage": bool,
+    "delayedCharacterDescriptions": bool,
+}
 BACKUP_FILE_NAME = "tatipVoiceSettings.json"
 _SPEECH_SECTION_NAME = "speech"
 # PPA Tatip is a 32-bit SAPI5 voice. A 64-bit NVDA reaches it through the
@@ -32,6 +44,14 @@ _TATIP_SAPI5_NAME_64BIT = "sapi5_32"
 _FORMAT_VERSION = 1
 
 _DEFAULT_VOICE_SETTINGS = {
+    "general": {
+        "symbolLevel": 300,
+        "unicodeNormalization": "DISABLED",
+        "autoLanguageSwitching": False,
+        "autoDialectSwitching": False,
+        "reportLanguage": False,
+        "delayedCharacterDescriptions": False,
+    },
     "sapi5": {
         "voice": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Speech\\Voices\\Tokens\\PPATatip",
         "volume": 40,
@@ -105,7 +125,49 @@ def captureVoiceSettings():
         section = dict.get(speechSection, _getConfigSectionName(sectionName))
         if isinstance(section, dict) and section:
             capturedSections[sectionName] = _toPlainDict(section)
+    # A backup that holds only the general options is not a Tatip voice backup.
+    if capturedSections:
+        generalValues = _readGeneralValues(speechSection)
+        if generalValues:
+            capturedSections[GENERAL_SECTION_NAME] = generalValues
     return capturedSections
+
+
+def _coerceGeneralValue(key, value):
+    expectedType = _GENERAL_SPEECH_KEYS[key]
+    if expectedType is bool:
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, str) and value.strip().lower() in ("true", "false"):
+            return value.strip().lower() == "true"
+        return None
+    if expectedType is int:
+        if isinstance(value, bool):
+            return None
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return None
+    return value if isinstance(value, str) and value else None
+
+
+def _sanitizeGeneralValues(values):
+    cleanValues = {}
+    for key in _GENERAL_SPEECH_KEYS:
+        if key not in values:
+            continue
+        cleanValue = _coerceGeneralValue(key, values[key])
+        if cleanValue is not None:
+            cleanValues[key] = cleanValue
+    return cleanValues
+
+
+def _readGeneralValues(speechSection):
+    rawValues = {}
+    for key in _GENERAL_SPEECH_KEYS:
+        if key in speechSection:
+            rawValues[key] = dict.__getitem__(speechSection, key)
+    return _sanitizeGeneralValues(rawValues)
 
 
 def writeBackupFile(backupPath, sections):
@@ -145,6 +207,11 @@ def readBackupFile(backupPath):
         sections[sectionName] = section
     if not sections:
         raise VoiceSettingsError(_("The backup file holds no Tatip voice option setting."))
+    generalSection = speechData.get(GENERAL_SECTION_NAME)
+    if isinstance(generalSection, dict):
+        generalValues = _sanitizeGeneralValues(generalSection)
+        if generalValues:
+            sections[GENERAL_SECTION_NAME] = generalValues
     return sections
 
 
@@ -166,6 +233,13 @@ def applyVoiceSettings(sections):
     speechSection = baseProfile[_SPEECH_SECTION_NAME]
     appliedNames = []
     for sectionName, values in sections.items():
+        if sectionName == GENERAL_SECTION_NAME:
+            generalValues = _sanitizeGeneralValues(values)
+            for key, value in generalValues.items():
+                speechSection[key] = value
+            if generalValues:
+                appliedNames.append(GENERAL_SECTION_NAME)
+            continue
         configSectionName = _getConfigSectionName(sectionName)
         if not isinstance(dict.get(speechSection, configSectionName), dict):
             speechSection[configSectionName] = {}

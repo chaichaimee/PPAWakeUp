@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: PPAWakeUp 2026.8.0\n"
+"Project-Id-Version: PPAWakeUp 2026.11.3\n"
 "Report-Msgid-Bugs-To: chaicm75@gmail.com\n"
-"POT-Creation-Date: 2026-07-28 10:29+0700\n"
+"POT-Creation-Date: 2026-11-16 08:08+0700\n"
 "PO-Revision-Date: \n"
 "Last-Translator: chaiBot and Malee Yamazaki\n"
 "Language-Team: Thai\n"
@@ -10,94 +10,430 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: DevOn Addon\n"
+"X-Generator: ChaiBot Addon\n"
 
-#: __init__.py:294
+#: userDictEditor.py:288
+msgid "&Add"
+msgstr "เพิ่ม (&A)"
+
+#: userDictEditor.py:289
+msgid "&Edit"
+msgstr "แก้ไ&ข"
+
+#: userDictEditor.py:279
+msgid "&Move to line:"
+msgstr "ไปยังบรรทัดที่ (&M):"
+
+#: userDictEditor.py:218
+msgid "&Pattern:"
+msgstr "รูปแบบ (&P):"
+
+#: userDictEditor.py:290
+msgid "&Remove"
+msgstr "ลบ(&R)"
+
+#: userDictEditor.py:221
+msgid "&Replacement:"
+msgstr "คำทดแทน (&R):"
+
+#: userDictEditor.py:281
+msgid "&Search:"
+msgstr "ค้นหา (&S):"
+
+#: userDictEditor.py:426
+msgid "Add Tatip dictionary word"
+msgstr "เพิ่มคำศัพท์ในพจนานุกรม Tatip"
+
+#: ppaWakeUpCore.py:575
+msgid "Already trying to wake up PPA Tatip, please wait"
+msgstr "กำลังพยายามปลุก PPA Tatip โปรดรอสักครู่"
+
+#: ppaWakeUpCore.py:253
+msgid "Automatically retry wake up if PPA Tatip does not start"
+msgstr "ลองปลุกใหม่อัตโนมัติหาก PPA Tatip ไม่เริ่มทำงาน"
+
+#: ppaWakeUpCore.py:656
+msgid "Backup Tatip Voice option Setting"
+msgstr "สำรองข้อมูลการตั้งค่าตัวเลือกเสียง Tatip"
+
+#: ppaWakeUpCore.py:654
 msgid "Backup Tatip dictionary"
-msgstr "สำรองพจนานุกรม Tatip"
+msgstr "สำรองข้อมูลพจนานุกรม Tatip"
 
-#: __init__.py:326
+#: ppaWakeUpCore.py:787
+#: ppaWakeUpCore.py:862
 msgid "Backup completed: {dest}"
 msgstr "สำรองข้อมูลเสร็จสมบูรณ์: {dest}"
 
-#: __init__.py:329
+#: ppaWakeUpCore.py:790
 msgid "Backup failed: file not written to {dest}"
 msgstr "การสำรองข้อมูลล้มเหลว: ไม่สามารถเขียนไฟล์ไปยัง {dest}"
 
-#: __init__.py:332
+#: ppaWakeUpCore.py:793
+#: ppaWakeUpCore.py:843
+#: ppaWakeUpCore.py:857
 msgid "Backup failed: {error}"
 msgstr "การสำรองข้อมูลล้มเหลว: {error}"
 
-#: __init__.py:349
+#: tatipDictionaryDriver.py:128
+msgid "Close the PPA Tatip dictionary window first"
+msgstr "ปิดหน้าต่างพจนานุกรม PPA Tatip ก่อน"
+
+#: ppaWakeUpCore.py:661
+msgid "Diagnostics: dump Tatip windows"
+msgstr "การวินิจฉัย: ดัมพ์หน้าต่าง Tatip"
+
+#: userDictEditor.py:284
+msgid "Dictionary &words"
+msgstr "คำศัพท์ในพจนานุกรม (&w)"
+
+#: ppaWakeUpCore.py:810
 msgid "Dictionary restored. Reloading PPA Tatip..."
-msgstr "กู้คืนพจนานุกรมเสร็จสิ้น กำลังโหลด PPA Tatip ใหม่..."
+msgstr "กู้คืนพจนานุกรมแล้ว กำลังโหลด PPA Tatip ใหม่..."
 
-#: __init__.py:285
+#: userDictEditor.py:565
+msgid "Dictionary saved"
+msgstr "บันทึกพจนานุกรมแล้ว"
+
+#: userDictEditor.py:596
+msgid "Dictionary saved by PPA Tatip"
+msgstr "พจนานุกรมถูกบันทึกโดย PPA Tatip"
+
+#: userDictEditor.py:447
+msgid "Edit Tatip dictionary word"
+msgstr "แก้ไขคำศัพท์ในพจนานุกรม Tatip"
+
+#: userDictEditor.py:499
+msgid "Enter a line number from 1 to {count}"
+msgstr "ป้อนหมายเลขบรรทัดจาก 1 ถึง {count}"
+
+#: ppaWakeUpCore.py:689
+msgid "Error: Failed to dump Tatip windows - {error}"
+msgstr "ข้อผิดพลาด: ไม่สามารถดัมพ์หน้าต่าง Tatip ได้ - {error}"
+
+#: ppaWakeUpCore.py:643
 msgid "Error: Failed to open PPA Tatip options - {error}"
-msgstr "ข้อผิดพลาด: ไม่สามารถเปิดตัวเลือก PPA Tatip - {error}"
+msgstr "ข้อผิดพลาด: ไม่สามารถเปิดตัวเลือก PPA Tatip ได้ - {error}"
 
-#: __init__.py:343
+#: ppaWakeUpCore.py:719
+msgid "Error: Failed to open the dictionary - {error}"
+msgstr "ข้อผิดพลาด: ไม่สามารถเปิดพจนานุกรมได้ - {error}"
+
+#: ppaWakeUpCore.py:848
+msgid "Error: No Tatip voice option setting was found in the NVDA configuration."
+msgstr "ข้อผิดพลาด: ไม่พบการตั้งค่าเสียง Tatip ในการกำหนดค่าของ NVDA"
+
+#: ppaWakeUpCore.py:804
+#: ppaWakeUpCore.py:872
 msgid "Error: No backup file found. Please perform a backup first."
 msgstr "ข้อผิดพลาด: ไม่พบไฟล์สำรองข้อมูล กรุณาสำรองข้อมูลก่อน"
 
-#: __init__.py:365
+#: ppaWakeUpCore.py:942
 msgid "Error: Tatip folder not found."
 msgstr "ข้อผิดพลาด: ไม่พบโฟลเดอร์ Tatip"
 
-#: __init__.py:278
+#: ppaWakeUpCore.py:683
+msgid "Error: no PPA Tatip window was found. Open the Tatip dictionary window first."
+msgstr "ข้อผิดพลาด: ไม่พบหน้าต่าง PPA Tatip กรุณาเปิดหน้าต่างพจนานุกรม Tatip ก่อน"
+
+#: ppaWakeUpCore.py:636
+#: ppaWakeUpCore.py:738
 msgid "Error: openoption.exe not found. Please ensure PPA Tatip is installed."
-msgstr "ข้อผิดพลาด: ไม่พบ openoption.exe โปรดตรวจสอบว่าติดตั้ง PPA Tatip แล้ว"
+msgstr "ข้อผิดพลาด:ไม่พบ openoption.exe กรุณาตรวจสอบให้แน่ใจว่าได้ติดตั้ง PPA Tatip แล้ว"
 
-#: __init__.py:317
+#: ppaWakeUpCore.py:779
 msgid "Error: userdict.txt not found at source location."
-msgstr "ข้อผิดพลาด: ไม่พบ userdict.txt ในตำแหน่งต้นทาง"
+msgstr "ข้อผิดพลาด: ไม่พบ userdict.txt ที่ตำแหน่งต้นทาง"
 
-#: __init__.py:243
+#: ppaWakeUpCore.py:705
+msgid "Error: userdict.txt not found. Please ensure PPA Tatip is installed."
+msgstr "ข้อผิดพลาด: ไม่พบ userdict.txt กรุณาตรวจสอบให้แน่ใจว่าได้ติดตั้ง PPA Tatip แล้ว"
+
+#: ppaWakeUpCore.py:584
 msgid "Error: windows_tatip.exe not found. Please ensure PPA Tatip is installed."
-msgstr "ข้อผิดพลาด: ไม่พบ windows_tatip.exe โปรดตรวจสอบว่าติดตั้ง PPA Tatip แล้ว"
+msgstr "ข้อผิดพลาด: ไม่พบ windows_tatip.exe กรุณาตรวจสอบให้แน่ใจว่าได้ติดตั้ง PPA Tatip แล้ว"
 
-#: __init__.py:371
+#: ppaWakeUpCore.py:948
 msgid "Failed to open folder: {error}"
-msgstr "ไม่สามารถเปิดโฟลเดอร์: {error}"
+msgstr "ไม่สามารถเปิดโฟลเดอร์ได้: {error}"
 
-#: __init__.py:296
+#: userDictEditor.py:239
+msgid "Invalid entry"
+msgstr "รายการไม่ถูกต้อง"
+
+#: userDictEditor.py:501
+msgid "Invalid line number"
+msgstr "หมายเลขบรรทัดไม่ถูกต้อง"
+
+#: userDictEditor.py:524
+msgid "Moved to line {line}"
+msgstr "ย้ายไปยังบรรทัด {line} แล้ว"
+
+#: userDictEditor.py:545
+msgid "No changes to save"
+msgstr "ไม่มีการเปลี่ยนแปลงที่ต้องบันทึก"
+
+#: userDictEditor.py:443
+#: userDictEditor.py:476
+#: userDictEditor.py:510
+msgid "No word is selected"
+msgstr "ไม่ได้เลือกคำใดๆ"
+
+#: ppaWakeUpCore.py:659
 msgid "Open Tatip folder"
 msgstr "เปิดโฟลเดอร์ Tatip"
 
-#: __init__.py:282
+#: ppaWakeUpCore.py:660
+msgid "Open Tatip options"
+msgstr "เปิดตัวเลือก Tatip"
+
+#: ppaWakeUpCore.py:640
 msgid "Option"
 msgstr "ตัวเลือก"
 
-#: __init__.py:27
-#: __init__.py:87
-#: __init__.py:299
+#: ppaWakeUpCore.py:653
+#: userDictEditor.py:256
+msgid "PPA Tatip Dictionary Editor"
+msgstr "ตัวแก้ไขพจนานุกรม PPA Tatip"
+
+#: tatipDictionaryDriver.py:103
+msgid "PPA Tatip changed the text that was entered"
+msgstr "PPA Tatip เปลี่ยนข้อความที่ป้อนแล้ว"
+
+#: tatipDictionaryDriver.py:100
+msgid "PPA Tatip did not accept the text"
+msgstr "PPA Tatip ไม่ยอมรับข้อความ"
+
+#: ppaWakeUpCore.py:614
+msgid "PPA Tatip did not confirm startup. Please try Windows+P again."
+msgstr "PPA Tatip ไม่ยืนยันการเริ่มต้นทำงาน กรุณากด Windows+P อีกครั้ง"
+
+#: tatipDictionaryDriver.py:85
+msgid "PPA Tatip did not respond while {step}"
+msgstr "PPA Tatip ไม่ตอบสนองระหว่าง {step}"
+
+#: userDictEditor.py:611
+msgid "PPA Tatip did not save the words"
+msgstr "PPA Tatip ไม่ได้บันทึกคำ"
+
+#: userDictEditor.py:604
+msgid "PPA Tatip did not save these words with a pronunciation code: {words}"
+msgstr "PPA Tatip ไม่ได้บันทึกคำเหล่านี้ด้วยรหัสการออกเสียง: {words}"
+
+#: ppaWakeUpCore.py:568
+msgid "PPA Tatip is already awake"
+msgstr "PPA Tatip ตื่นอยู่แล้ว"
+
+#: tatipDictionaryDriver.py:125
+msgid "PPA Tatip is not running. Press Windows+P to wake it up first"
+msgstr "PPA Tatip ไม่ได้ทำงานอยู่ กรุณากด Windows+P เพื่อปลุกก่อน"
+
+#: tatipDictionaryDriver.py:77
+msgid "PPA Tatip window changed: button not found while {step}"
+msgstr "หน้าต่าง PPA Tatip เปลี่ยนแปลง: ไม่พบปุ่มระหว่าง {step}"
+
+#: tatipDictionaryDriver.py:145
+msgid "PPA Tatip window changed: the Add button was not found"
+msgstr "หน้าต่าง PPA Tatip เปลี่ยนแปลง: ไม่พบปุ่มเพิ่ม"
+
+#: tatipDictionaryDriver.py:95
+msgid "PPA Tatip word window has {count} edit boxes instead of 2"
+msgstr "หน้าต่างคำของ PPA Tatip มีช่องแก้ไข {count} ช่อง แทนที่จะเป็น 2 ช่อง"
+
+#: ppaWakeUpCore.py:154
+#: ppaWakeUpCore.py:214
+#: ppaWakeUpCore.py:664
 msgid "PPA Tatip – Menu"
 msgstr "PPA Tatip – เมนู"
 
-#: __init__.py:93
+#: ppaWakeUpCore.py:312
 msgid "PPAWakeUp"
 msgstr "PPAWakeUp"
 
-#: __init__.py:295
+#: userDictEditor.py:386
+msgid "Please wait, PPA Tatip is saving the words"
+msgstr "กรุณารอ, PPA Tatip กำลังบันทึกคำ"
+
+#: ppaWakeUpCore.py:245
+msgid "Protect against crash when focusing Open/OK/Save buttons in dialogs"
+msgstr "ป้องกันการขัดข้องเมื่อโฟกัสปุ่ม เปิด/ตกลง/บันทึก ในกล่องโต้ตอบ"
+
+#: ppaWakeUpCore.py:657
+msgid "Restore Tatip Voice option Setting"
+msgstr "ตั้งค่าตัวเลือกคืนค่าเสียง Tatip"
+
+#: ppaWakeUpCore.py:655
 msgid "Restore Tatip dictionary"
-msgstr "กู้คืนพจนานุกรม Tatip"
+msgstr "คืนค่าพจนานุกรม Tatip"
 
-#: __init__.py:354
+#: ppaWakeUpCore.py:892
+msgid "Restore failed: NVDA cannot save its configuration right now."
+msgstr "การคืนค่าล้มเหลว: NVDA ไม่สามารถบันทึกการกำหนดค่าได้ในขณะนี้"
+
+#: ppaWakeUpCore.py:815
+#: ppaWakeUpCore.py:877
+#: ppaWakeUpCore.py:903
 msgid "Restore failed: {error}"
-msgstr "การกู้คืนล้มเหลว: {error}"
+msgstr "การคืนค่าล้มเหลว: {error}"
 
-#: __init__.py:369
+#: userDictEditor.py:558
+msgid "Save failed"
+msgstr "การบันทึก Lลเหลว"
+
+#: userDictEditor.py:574
+msgid "Sending {count} words to PPA Tatip, please wait"
+msgstr "กำลังส่ง {count} คำไปยัง PPA Tatip กรุณารอ"
+
+#: ppaWakeUpCore.py:237
+msgid "Skip Chinese, Japanese and Korean characters when speaking"
+msgstr "ข้ามตัวอักษรจีน ญี่ปุ่น และเกาหลี เมื่ออ่าน"
+
+#: userDictEditor.py:276
+msgid "Sort a-z"
+msgstr "เรียงลำดับจาก A ถึง Z"
+
+#: userDictEditor.py:419
+msgid "Sorted a-z, then Thai. Press Apply to save"
+msgstr "เรียงลำดับจาก A ถึง Z แล้วตามด้วยภาษาไทย กดนำไปใช้เพื่อบันทึก"
+
+#: ppaWakeUpCore.py:222
+msgid "Tatip Reader Setting"
+msgstr "การตั้งค่าโปรแกรมอ่าน Tatip"
+
+#: ppaWakeUpCore.py:946
 msgid "Tatip folder opened"
 msgstr "เปิดโฟลเดอร์ Tatip แล้ว"
 
-#: __init__.py:261
+#: ppaWakeUpCore.py:652
+msgid "Tatip reader setting"
+msgstr "การตั้งค่าโปรแกรมอ่าน Tatip"
+
+#: ppaWakeUpCore.py:908
+msgid "Tatip voice option setting restored. Restarting NVDA..."
+msgstr "กู้คืนการตั้งค่าตัวเลือกเสียง Tatip แล้ว กำลังรีสตาร์ท NVDA..."
+
+#: ppaWakeUpCore.py:687
+msgid "Tatip window dump saved"
+msgstr "บันทึกการดึงข้อมูลหน้าต่าง Tatip แล้ว"
+
+#: tatipDictionaryDriver.py:140
+msgid "The PPA Tatip dictionary window did not appear"
+msgstr "หน้าต่างพจนานุกรม PPA Tatip ไม่ปรากฏขึ้น"
+
+#: tatipDictionaryDriver.py:134
+msgid "The PPA Tatip options window did not appear"
+msgstr "หน้าต่างตัวเลือก PPA Tatip ไม่ปรากฏขึ้น"
+
+#: tatipDictionaryDriver.py:150
+msgid "The PPA Tatip word window did not appear"
+msgstr "หน้าต่างคำของ PPA Tatip ไม่ปรากฏขึ้น"
+
+#: tatipVoiceSettings.py:209
+msgid "The backup file holds no Tatip voice option setting."
+msgstr "ไฟล์สำรองไม่มีการตั้งค่าตัวเลือกเสียงของ Tatip"
+
+#: tatipVoiceSettings.py:196
+#: tatipVoiceSettings.py:199
+#: tatipVoiceSettings.py:206
+msgid "The backup file is damaged or has an unexpected layout."
+msgstr "ไฟล์สำรองเสียหายหรือมีรูปแบบที่ไม่คาดคิด"
+
+#: userDictEditor.py:556
+msgid "The dictionary could not be saved: {error}"
+msgstr "ไม่สามารถบันทึกพจนานุกรมได้: {error}"
+
+#: userDictEditor.py:177
+msgid "The pattern must not be empty"
+msgstr "รูปแบบต้องไม่ว่างเปล่า"
+
+#: userDictEditor.py:184
+msgid "The reading has an unmatched parenthesis"
+msgstr "การอ่านมีวงเล็บเปิดปิดไม่ตรงกัน"
+
+#: userDictEditor.py:180
+msgid "The reading must not be empty"
+msgstr "การอ่านต้องไม่ว่างเปล่า"
+
+#: userDictEditor.py:174
+msgid "The reading must not contain a colon"
+msgstr "การอ่านต้องไม่มีเครื่องหมายทวิภาค"
+
+#: userDictEditor.py:197
+msgid "The text contains a character that cannot be saved in the dictionary file"
+msgstr "ข้อความมีอักขระที่ไม่สามารถบันทึกในไฟล์พจนานุกรมได้"
+
+#: userDictEditor.py:171
+msgid "The text must not contain double quotes or line breaks"
+msgstr "ข้อความต้องไม่มีเครื่องหมายคำพูดคู่หรือขึ้นบรรทัดใหม่"
+
+#: userDictEditor.py:410
+msgid "The words are already sorted"
+msgstr "คำเหล่านี้เรียerdเรียบร้อยแล้ว"
+
+#: userDictEditor.py:639
+msgid "There are unsaved changes. Close without saving?"
+msgstr "มีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก ต้องการปิดโดยไม่บันทึกหรือไม่"
+
+#: ppaWakeUpCore.py:619
 msgid "Unexpected error: {error}"
-msgstr "ข้อผิดพลาดที่ไม่คาดคิด: {error}"
+msgstr "เกิดข้อผิดพลาดที่ไม่คาดคิด: {error}"
 
-#: __init__.py:248
+#: userDictEditor.py:190
+msgid "Unknown marker ({marker}). Allowed words: half, short, long, samun, ake, tho, three, jutthawa, -d, -f, -k, -l, -s, -sh, -t, +s, +es, +ed"
+msgstr "ไม่รู้จักเครื่องหมาย ({marker}) คำที่อนุญาต: half, short, long, samun, ake, tho, three, jutthawa, -d, -f, -k, -l, -s, -sh, -t, +s, +es, +ed"
+
+#: userDictEditor.py:641
+msgid "Unsaved changes"
+msgstr "การเปลี่ยนแปลงที่ยังไม่ได้บันทึก"
+
+#: ppaWakeUpCore.py:590
 msgid "Wake up"
-msgstr "ปลุก"
+msgstr "ปุก"
 
-#: __init__.py:220
-msgid "Wake up PPA Tatip (single tap), Open options (double tap), Open menu (triple tap)"
-msgstr "ปลุก PPA Tatip (แตะครั้งเดียว), เปิดตัวเลือก (แตะสองครั้ง), เปิดเมนู (แตะสามครั้ง)"
+#: ppaWakeUpCore.py:546
+msgid "Wake up PPA Tatip (single tap), Edit Tatip dictionary (double tap), Open menu (triple tap)"
+msgstr "ปุก PPA Tatip (แตะครั้งเดียว), แก้ไขพจนานุกรม Tatip (แตะสองครั้ง), เปิดเมนู (แตะสามครั้ง)"
+
+#: ppaWakeUpCore.py:261
+msgid "Wake up PPA Tatip automatically when NVDA starts with the Tatip voice"
+msgstr "ปุก PPA Tatip โดยอัตโนมัติเมื่อ NVDA เริ่มต้นด้วยเสียง Tatip"
+
+#: tatipDictionaryDriver.py:122
+msgid "Windows must use the Thai language for non-Unicode programs to send words to PPA Tatip"
+msgstr "Windows ต้องใช้ภาษาไทยสำหรับโปรแกรมที่ไม่ใช่ Unicode เพื่อส่งคำไปยัง PPA Tatip"
+
+#: userDictEditor.py:434
+msgid "Word added. Press Apply to save"
+msgstr "เพิ่มคำแล้ว กดปุ่มนำไปใช้เพื่อบันทึก"
+
+#: userDictEditor.py:486
+msgid "Word removed. Press Apply to save"
+msgstr "ลบคำแล้ว กดปุ่มนำไปใช้เพื่อบันทึก"
+
+#: userDictEditor.py:457
+msgid "Word updated. Press Apply to save"
+msgstr "อัปเดตคำแล้ว กดปุ่มนำไปใช้เพื่อบันทึก"
+
+#: tatipDictionaryDriver.py:157
+msgid "closing the options window"
+msgstr "กำลังปิดหน้าต่างตัวเลือก"
+
+#: tatipDictionaryDriver.py:153
+msgid "confirming a word"
+msgstr "กำลังยืนยันคำ"
+
+#: userDictEditor.py:361
+msgid "line"
+msgstr "บรรทัด"
+
+#: tatipDictionaryDriver.py:155
+msgid "saving the dictionary"
+msgstr "กำลังบันทึกพจนานุกรม"
+
+#: ppaWakeUpCore.py:658
+msgid "standard default tatip voice settings"
+msgstr "การตั้งค่าเสียง Tatip เริ่มต้นมาตรฐาน"
+
+#: userDictEditor.py:397
+msgid "{count} results found"
+msgstr "พบ {count} ผลลัพธ์"

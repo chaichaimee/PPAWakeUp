@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: PPAWakeUp 2026.12.0\n"
+"Project-Id-Version: PPAWakeUp 2026.11.3\n"
 "Report-Msgid-Bugs-To: chaicm75@gmail.com\n"
-"POT-Creation-Date: 2026-11-14 10:23+0700\n"
+"POT-Creation-Date: 2026-11-16 08:08+0700\n"
 "PO-Revision-Date: \n"
 "Last-Translator: chaiBot and Malee Yamazaki\n"
 "Language-Team: English\n"
@@ -328,13 +328,13 @@ msgstr "The PPA Tatip options window did not appear"
 msgid "The PPA Tatip word window did not appear"
 msgstr "The PPA Tatip word window did not appear"
 
-#: tatipVoiceSettings.py:147
+#: tatipVoiceSettings.py:209
 msgid "The backup file holds no Tatip voice option setting."
 msgstr "The backup file holds no Tatip voice option setting."
 
-#: tatipVoiceSettings.py:134
-#: tatipVoiceSettings.py:137
-#: tatipVoiceSettings.py:144
+#: tatipVoiceSettings.py:196
+#: tatipVoiceSettings.py:199
+#: tatipVoiceSettings.py:206
 msgid "The backup file is damaged or has an unexpected layout."
 msgstr "The backup file is damaged or has an unexpected layout."
 
